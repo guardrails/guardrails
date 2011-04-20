@@ -1,0 +1,21 @@
+error # Single_Model_read
+error # Many_Model_read
+error # Model_creation
+error # Model_destruction
+error # Attribute_read
+error # Attribute_write
+error # Singular_association_read
+error # Singular_association_write
+error # Plural_association_read
+error # Plural_association_write
+def pass_user
+	if session[:user].nil? then
+      Thread.current["user"] = :false
+	else
+      if self.respond_to?("current_user") then
+         Thread.current["user"] = @current_user
+      else
+         Thread.current["user"] = :false
+		end
+	end
+end
