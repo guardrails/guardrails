@@ -30,3 +30,22 @@ GUARDRAILS SETUP:
 
    *** Refer to the USING_GAURDRAILS.txt file for more details on using features of GuardRails
 
+GEM MODIFICATIONS:
+------------------
+	Because string interpolation is only controlled by native Ruby code, it can potentially 
+	drop taint information.  For this reason, any cases of interpolation must be removed 
+	from ruby libraries that are used in your application that may handle sensitive string
+	information.  Note that this is done for your application by default.  Rails, however, must
+	be modified to remove interpolation.  Currently, this can be done with the following steps:
+
+	1.  Replace the ruby2ruby.rb file in your gem library with the ruby2ruby.rb file given
+	    in the repository
+	2.  Back up a copy of the rails gem you are using
+	3.  Run the 'converter.rb' file Ruby 1.8 giving the directory of the actionpack gem for
+	    the version of rails you are using
+
+	Note that this only removes interpolation from actionpack rails files, but this is
+	often sufficient to secure the application.  This transformation will soon be able to
+	be applied to all of rails and arbitrary code libraries.  In addition, we will soon
+	provide pre-transformed versions of rails that can be installed simply as another
+	version of rails and thus no rails gems will need to be modified.
