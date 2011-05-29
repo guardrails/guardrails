@@ -33,7 +33,9 @@ class GParser
 
 
 	def parse(filename)
+		begin
 		return unless File.exist?(filename)
+
 		@src = File.read(filename)	
 		@parser = RubyParser.new
 		@lexer = @parser.lexer	
@@ -57,6 +59,9 @@ class GParser
 		end	
 
 		traverse(@ast)
+		rescue 
+			puts "Did not transform #{filename}"
+		end	
 		return @ast
 	end
 

@@ -94,7 +94,7 @@ class GTransformer
 	def convert(tables_to_fields)
 		models_to_fields = {}
 		for table in tables_to_fields.keys do
-			modelname = "#{table[0..-2].downcase}.rb"		# improve			tra
+			modelname = "#{table[0..-2].downcase}.rb"
 			models_to_fields[modelname] = tables_to_fields[table]
 		end
 		return models_to_fields
@@ -143,7 +143,7 @@ class GTransformer
 
 		for filename in asts[:model].keys do
 			#disallow_features(asts[:model][filename])
-			#transform_model(asts[:model][filename], models_to_fields[filename])
+			transform_model(asts[:model][filename], models_to_fields[filename])
 		end 
 
 		for filename in asts[:controller].keys do

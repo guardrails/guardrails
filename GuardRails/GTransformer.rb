@@ -90,11 +90,11 @@ class GTransformer
 		asts[:helper].insert_into_class! @parser.parse(
 			'def protect
     		 	yield
-    			#@output_buffer = @output_buffer.transform(:HTML)
+    			@output_buffer = @output_buffer.transform(:HTML)
 			 end')
 
 		# Handle taint tracking transformations
-	#	taint_tracking_transformations(asts)
+		taint_tracking_transformations(asts)
 
 		# We need the models to have access to the authentication information so they can decide
 		# about authorization. 
