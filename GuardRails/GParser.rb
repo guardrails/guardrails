@@ -108,7 +108,6 @@ class GParser
 
 		ann_src.slice!(/^\s*#\s@/)
 		arr = ann_src.split(",") #TODO - split by something else
-
 		ann.policy = arr[0].strip.to_sym
 		ann.lambda = arr[arr.length-1].strip
 

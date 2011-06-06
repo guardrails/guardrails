@@ -24,19 +24,29 @@ class GTransformer
 
 		function = "def populate_policies\n"
 		for ann in ann_list do
-			function += "#{ann.target}.assign_policy (:#{ann.policy}, '#{ann.lambda.to_s}')\n"
+                  function += "#{ann.target}.assign_policy (:#{ann.policy}, '#{ann.lambda.to_s}', :self, self, '#{ann.target}')\n"                 
 		end
 		function += "end"
-
 		ast.insert_into_class!(@parser.parse(function))
+
+
+		function = "def self.populate_policies\n"
+		for ann in ann_list do
+                        if ann.type == :class 
+                          function += "#{ann.target}.assign_policy (:#{ann.policy}, '#{ann.lambda.to_s}')\n"
+                        end
+		end
+		function += "end"
+		ast.insert_into_class!(@parser.parse(function))
+
 		return ast
 	end
 
 	# Transformations to enforce policies
-	#def access_policy_transformations(ast)
-	#	ast.insert_into_class! @parser.parse("gr_policy_setup")
-	#	return ast
-	#end
+	def access_policy_transformations(ast)
+		ast.insert_into_class! @parser.parse("gr_policy_setup")
+		return ast
+	end
 
 	# Replaces all references to Models in target ast with a ModelProxyObject.
 	# We do this so we can intercept calls like [Model].find and [Model].delete
@@ -49,6 +59,8 @@ class GTransformer
 				"def gr_#{model_name}; ModelProxy.new(#{model_name}); end")
 			ast.insert_into_class! @parser.parse(
 				"def self.gr_#{model_name}; ModelProxy.new(#{model_name}); end")
+                        ast.insert_into_class! @parser.parse(
+                                                             "#{model_name}.populate_policies")
 		end
 		return ast
 	end
@@ -67,7 +79,7 @@ class GTransformer
 
 			ast = universal_transformations(ast)
 			ast = build_policy_objects(ast, ann_list)
-			#ast = access_policy_transformations(ast)
+			ast = access_policy_transformations(ast)
 
 			asts[:model][filename] = ast
 		end

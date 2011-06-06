@@ -132,20 +132,41 @@ module Wrapper
     alias_method :old_respond_to?, :respond_to?
     def respond_to?(param)
       old_respond_to?(param) || @target.respond_to?(param)
+    end   
+    def assign_policy(*args)
+      target.target.send("assign_policy",*args)
     end
-
+    def policy_object
+      target.target.send("policy_object")
+    end
     def method_missing(method, *args, &body)    
       if in_set?(["<<","clear","delete"],method.to_s)
         if !call_if_exists(@parent, "gr_#{@target.proxy_reflection.name.to_s}_w?")
           guard_rails_error("Not authorized to use #{method.to_s} on read-only object")
 				# Plural assoc write
         end
-        if @parent.respond_to?("gr_can_edit?") 
+        failed = false
+        if @parent.respond_to?("gr_can_edit?")
           if !@parent.gr_can_edit?
-            guard_rails_error("Not authorized to use #{method.to_s} on read-only object")
-					# Plural assoc write
+            failed = true
           end
         end
+        if @target.respond_to?("gr_can_edit?")
+          if !@target.gr_can_edit?
+            failed = true
+          end
+        end
+        if self.respond_to?("gr_can_edit?")
+          if !self.gr_can_edit?
+            failed = true
+          end
+        end
+        if @target.respond_to?("target")
+          if !@target.target.gr_can_edit?
+            failed = true
+          end
+        end
+        guard_rails_error("Not authorized to use #{method.to_s} on read-only object") if failed
       end
       special_function = "gr_#{@target.proxy_reflection.name.to_s}_#{method.to_s}"
       if @parent.respond_to?(special_function)
@@ -158,6 +179,9 @@ module Wrapper
         sidelog.debug(method.to_s + " " + args.to_s)          
       #  args = clean_args(args)
         sidelog.debug(method.to_s + " " + args.to_s)          
+      end
+      target.each do |obj|
+        obj.populate_policies
       end
       if block_given?
         @target.target.send(method,*args,&body)
@@ -195,13 +219,24 @@ class ModelProxy < WrapperCore
 
 		# CREATION PERMISSION CHECK - User.create
 		if method.to_s == "new" || method.to_s == "create"
+                  if @target.gr_can_create?
 			new_obj = @target.send(method, *args, &block)
 			return new_obj if new_obj.gr_can_create?
+                  else
+                    raise GuardRailsError, "Not Authorized to Create New Object"
+                    return nil
+                  end
 		end
 
 		# DELETION PERMISSION CHECK - User.delete
 		if ["delete","destroy"].include? method.to_s
-			# COME BACK TO THIS
+                  puts "CHECKING!!!!!!!!!!!!"
+                  if @target.gr_can_destroy?
+			return @target.send(method, *args, &block)
+                  else
+                    raise GuardRailsError, "Not Authorized to Destroy New Object"
+                    return nil
+                  end
 		end
 
 		# READ PERMISSION CHECK - User.find
@@ -210,6 +245,7 @@ class ModelProxy < WrapperCore
 		return nil if return_val.nil?
 
 		# Make sure the object is visible
+                return_val.populate_policies
 		return nil unless return_val.gr_is_visible?
 		
 		# Check each of the array elements
