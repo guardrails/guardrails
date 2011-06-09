@@ -1,15 +1,15 @@
 class GuardRailsError < SecurityError
 end
-module Wrapper
-	#load "GActiveRecord.rb"
-	load "GObject.rb"
-  module WrapperMethods
 
-    def guard_rails_error(message)      
+module Wrapper
+  #load "GActiveRecord.rb"
+  load "GObject.rb"
+  module WrapperMethods
+    def guard_rails_error(message)
       raise GuardRailsError, message
     end
 
-    # Helpers to process visibility 
+    # Helpers to process visibility
     def check_visible(obj)
       return obj.gr_is_visible?
     end
@@ -44,6 +44,7 @@ module Wrapper
       end
       return args
     end
+
     def clean_arg(arg)
       if arg.class == Hash
         arg.each_pair do |key, val|
@@ -55,9 +56,10 @@ module Wrapper
         end
       elsif arg.class == String
         arg = arg.pull_sql_safe
-      end  
+      end
       return arg
-    end    
+    end
+
     # Wrapper Helper to determine the actual class of an object that may be a wrapper
     def get_true_class(obj)
       return obj.true_class
@@ -87,63 +89,77 @@ module Wrapper
     def target
       @target
     end
+
     def id
       @target.id
     end
+
     def inspect
       @target.inspect
     end
+
     def to_param
       @target.to_param
     end
+
     def is_a?(thing)
       @target.is_a?(thing)
     end
+
     def kind_of?(thing)
       @target.kind_of?(thing)
     end
+
     def class
       return @target.class
     end
+
     def type
       return @target.type
     end
+
     def to_s
       return @target.to_s
     end
   end
 
-# ------------------------------------------------------------
-# ---------------- AssociationProxyWrapper -------------------
-# ------------------------------------------------------------
+  # ------------------------------------------------------------
+  # ---------------- AssociationProxyWrapper -------------------
+  # ------------------------------------------------------------
   class AssociationProxyWrapper < WrapperCore
     include WrapperMethods
     def true_class
       return AssociationProxyWrapper
     end
+
     def initialize(targ, prnt)
       @target = targ
       @parent = prnt
     end
+
     def parent
       @parent
     end
 
     alias_method :old_respond_to?, :respond_to?
+
     def respond_to?(param)
       old_respond_to?(param) || @target.respond_to?(param)
-    end   
+    end
+
     def assign_policy(*args)
       target.target.send("assign_policy",*args)
     end
+
     def policy_object
       target.target.send("policy_object")
     end
-    def method_missing(method, *args, &body)    
+
+    def method_missing(method, *args, &body)
       if in_set?(["<<","clear","delete"],method.to_s)
         if !call_if_exists(@parent, "gr_#{@target.proxy_reflection.name.to_s}_w?")
           guard_rails_error("Not authorized to use #{method.to_s} on read-only object")
-				# Plural assoc write
+          # Plural assoc write
         end
         failed = false
         if @parent.respond_to?("gr_can_edit?")
@@ -176,9 +192,9 @@ module Wrapper
       end
       if method.to_s == "find"
         sidelog = Logger.new('sidelog.txt')
-        sidelog.debug(method.to_s + " " + args.to_s)          
-      #  args = clean_args(args)
-        sidelog.debug(method.to_s + " " + args.to_s)          
+        sidelog.debug(method.to_s + " " + args.to_s)
+        #  args = clean_args(args)
+        sidelog.debug(method.to_s + " " + args.to_s)
       end
       target.each do |obj|
         obj.populate_policies
@@ -189,91 +205,92 @@ module Wrapper
         @target.send(method,*args,&body)
       end
     end
+
     def true_class
       AssociationProxyWrapper
     end
   end
 
-# ------------------------------------------------------------
-# ----------------------- ModelProxy -------------------------
-# ------------------------------------------------------------
-class ModelProxy < WrapperCore
-	include WrapperMethods
+  # ------------------------------------------------------------
+  # ----------------------- ModelProxy -------------------------
+  # ------------------------------------------------------------
+  class ModelProxy < WrapperCore
+    include WrapperMethods
+    def true_class
+      return ModelProxy
+    end
 
-	def true_class
-		return ModelProxy
-	end
+    def initialize(targ)
+      @target = targ
+    end
 
-	def initialize(targ)
-		@target = targ
-	end 
+    alias_method :old_respond_to?, :respond_to?
 
-	alias_method :old_respond_to?, :respond_to?
-	def respond_to?(param)
-		old_respond_to?(param) || @target.respond_to?(param)
-	end
+    def respond_to?(param)
+      old_respond_to?(param) || @target.respond_to?(param)
+    end
 
-	# This function does all the heavy lifting for ModelProxy objects. Virtually all the functions come 
-	# in through here and are processed to see if they are legal or not.
-	def method_missing(method, *args, &block)
+    # This function does all the heavy lifting for ModelProxy objects. Virtually all the functions come
+    # in through here and are processed to see if they are legal or not.
+    def method_missing(method, *args, &block)
 
-		# CREATION PERMISSION CHECK - User.create
-		if method.to_s == "new" || method.to_s == "create"
-                  if @target.gr_can_create?
-			new_obj = @target.send(method, *args, &block)
-			return new_obj if new_obj.gr_can_create?
-                  else
-                    raise GuardRailsError, "Not Authorized to Create New Object"
-                    return nil
-                  end
-		end
+      # CREATION PERMISSION CHECK - User.create
+      if method.to_s == "new" || method.to_s == "create"
+        if @target.gr_can_create?
+          new_obj = @target.send(method, *args, &block)
+          return new_obj if new_obj.gr_can_create?
+        else
+          raise GuardRailsError, "Not Authorized to Create New Object"
+          return nil
+        end
+      end
 
-		# DELETION PERMISSION CHECK - User.delete
-		if ["delete","destroy"].include? method.to_s
-                  puts "CHECKING!!!!!!!!!!!!"
-                  if @target.gr_can_destroy?
-			return @target.send(method, *args, &block)
-                  else
-                    raise GuardRailsError, "Not Authorized to Destroy New Object"
-                    return nil
-                  end
-		end
+      # DELETION PERMISSION CHECK - User.delete
+      if ["delete","destroy"].include? method.to_s
+        puts "CHECKING!!!!!!!!!!!!"
+        if @target.gr_can_destroy?
+          return @target.send(method, *args, &block)
+        else
+          raise GuardRailsError, "Not Authorized to Destroy New Object"
+          return nil
+        end
+      end
 
-		# READ PERMISSION CHECK - User.find
-		return_val = @target.send(method, *args, &block)
+      # READ PERMISSION CHECK - User.find
+      return_val = @target.send(method, *args, &block)
 
-		return nil if return_val.nil?
+      return nil if return_val.nil?
 
-		# Make sure the object is visible
-                return_val.populate_policies
-		return nil unless return_val.gr_is_visible?
-		
-		# Check each of the array elements
-		if return_val.is_a? Array
-			new_results = []
+      # Make sure the object is visible
+      return_val.populate_policies
+      return nil unless return_val.gr_is_visible?
 
-			for element in return_val
-				if element.is_a? ActiveRecord::Base
-					element.populate_policies
-					if element.gr_is_visible?
-						new_results << element
-						element.gr_policy_setup
-					end
-				else
-					new_results << element
-				end
-			end
-		return new_results
+      # Check each of the array elements
+      if return_val.is_a? Array
+        new_results = []
 
-		# If the result is a single object, set up the gr policies on it
-		else
-			return_val.populate_policies
-			return_val.gr_policy_setup
-		end
+        for element in return_val
+          if element.is_a? ActiveRecord::Base
+            element.populate_policies
+            if element.gr_is_visible?
+              new_results << element
+              element.gr_policy_setup
+            end
+          else
+            new_results << element
+          end
+        end
+        return new_results
 
-		return return_val
-	end
-end
+        # If the result is a single object, set up the gr policies on it
+      else
+        return_val.populate_policies
+        return_val.gr_policy_setup
+      end
+
+      return return_val
+    end
+  end
 end
 
 #if return_val.class == Array
@@ -292,23 +309,23 @@ end
 #			end
 #			return new_array
 
-		# DELETION PERMISSION CHECK
-		#if ["delete","destroy"].include? method.to_s
-		#	if args[0].is_a? Array
-		#		new_args = Array.new
-		#		for id in args[0]
-		#			found_obj = find(id)
+# DELETION PERMISSION CHECK
+#if ["delete","destroy"].include? method.to_s
+#	if args[0].is_a? Array
+#		new_args = Array.new
+#		for id in args[0]
+#			found_obj = find(id)
 #
 #					if found_obj.gr_can_destroy?
 #						new_args << id
 #					else
 #						# If error is not transparent, we prevent any deletes from executing
 #						# Otherwise, we continue with deletes and ignore the unauthorized delete.
-#						if found_obj.error_cases(:model_destroy) != "transparent"						
+#						if found_obj.error_cases(:model_destroy) != "transparent"
 #							return found_obj.error_case_result(:model_destroy)
 #						end
-#					end				
-					
+#					end
+
 #				end
 #				args[0] = new_args
 #				return @target.send(method, *args, &block)
@@ -324,17 +341,17 @@ end
 #			end
 #		end
 
-		# DELETION PERMISSION CHECK
+# DELETION PERMISSION CHECK
 #		if method.to_s == "delete_all"
 #			count = 0
 #			objs_to_delete = Array.new
 #			@target.find(:all, :conditions => args[0]).each { |object|
 #				if object.gr_can_destroy?
-#					objs_to_delete << object 
+#					objs_to_delete << object
 #				else
 #					# If error is not transparent, we prevent any deletes from executing
 #					# Otherwise, we continue with deletes and ignore the unauthorized delete.
-#					if object.error_cases(:model_destroy) != "transparent"						
+#					if object.error_cases(:model_destroy) != "transparent"
 #						return object.error_case_result(:model_destroy)
 #					end
 #				end
@@ -351,11 +368,11 @@ end
 #			objs_to_delete = Array.new
 #			@target.find(:all, :conditions => args[0]).each { |object|
 #				if object.gr_can_destroy?
-#					objs_to_delete << object 
+#					objs_to_delete << object
 #				else
 #					# If error is not transparent, we prevent any deletes from executing
 #					# Otherwise, we continue with deletes and ignore the unauthorized delete.
-#					if object.error_cases(:model_destroy) != "transparent"						
+#					if object.error_cases(:model_destroy) != "transparent"
 #						return object.error_case_result(:model_destroy)
 #					end
 #				end
@@ -367,19 +384,19 @@ end
 #		end
 #
 
-      #args = clean_args(args)
-      
-      # Update_all currently prohibited
- #     if method.to_s == "update_all"
-  #      guard_rails_error("update_all is forbidden in GuardRails because of security implications, please manually use update_attributes")
-   #   end
+#args = clean_args(args)
 
-      #Special Handling so 'count' only includes visible objects
+# Update_all currently prohibited
+#     if method.to_s == "update_all"
+#      guard_rails_error("update_all is forbidden in GuardRails because of security implications, please manually use update_attributes")
+#   end
+
+#Special Handling so 'count' only includes visible objects
 #      if method.to_s == "count"
- #       group_handling = false
-  #      begin
-   #       return_val = @target.send("all",*args)
- #       rescue
+#       group_handling = false
+#      begin
+#       return_val = @target.send("all",*args)
+#       rescue
 #          group_handling = true
 #          if args[0][:group] != nil
 #            group = args[0][:group]
@@ -406,19 +423,17 @@ end
 #          return return_val.size
 #        end
 #      end
-      # --- end 'count' handling
+# --- end 'count' handling
 
 #      return_val = @target.send(method, *args, &block)
 #		return nil if return_val.nil?
 
-      # Cover NamedScopes that are returned
+# Cover NamedScopes that are returned
 #      if return_val.class == ActiveRecord::NamedScope::Scope
 #        return ModelProxy.new(return_val)
 #      end
 
-
-
-		# Ensures all the results are visible. 
+# Ensures all the results are visible.
 #		if return_val.class == Array
 #			new_array = Array.new
 #			for ele in return_val
@@ -434,14 +449,14 @@ end
 #				end
 #			end
 #			return new_array
-#		
-#		else 
+#
+#		else
 #			if return_val.respond_to?("gr_is_visible") and not return_val.gr_is_visible?
 #				return return_val.error_case_result(:single_model_read, return_val.class.to_s)
 #			end
 #			return return_val.setup if return_val.respond_to? "setup"
 #			return return_val
 #		end
- #   end
-  #end
+#   end
+#end
 #end
