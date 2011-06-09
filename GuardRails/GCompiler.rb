@@ -34,8 +34,15 @@ class GCompiler
 		ann_lists = {}
 		for filename in @asts[:model].keys do
 			ann_lists[filename] = GParser.new.get_annotations("#{dir}/#{get_path(filename)}")
-		end
-
+		end            
+                puts "*************Annotations Discovered:*************"
+                ann_lists.each_pair do |key, val|           
+                 puts "#{key} => #{val.inspect}"
+  #               val.each do |val2|
+ ##             puts " --- #{val2.inspect} + #{val2.lambda.class}"
+ #                end
+                end
+                puts "*************************************************"
 		# Get the list of models that extend ActiveRecord::Base
 		model_names = []
 		model_files = []

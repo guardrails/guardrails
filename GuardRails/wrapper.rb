@@ -230,7 +230,6 @@ class ModelProxy < WrapperCore
 
 		# DELETION PERMISSION CHECK - User.delete
 		if ["delete","destroy"].include? method.to_s
-                  puts "CHECKING!!!!!!!!!!!!"
                   if @target.gr_can_destroy?
 			return @target.send(method, *args, &block)
                   else
