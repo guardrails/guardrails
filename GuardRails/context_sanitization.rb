@@ -3,7 +3,7 @@ module ContextSanitization
   
   # Sanitize any HTML tainted chunks based on the sanitization routine they
   # specify in their taint policy
-  def context_sanitize(text)  
+  def context_sanitize(text)
     new_string = ""
     index = 0
     text = text.compress_taint #(States::HTML) #This originally used the 'special compress taint'
@@ -12,7 +12,6 @@ module ContextSanitization
         new_string += str
       else          
         new_text = new_string + after_slice(text,index) 
-        puts "********* #{tnt}"
         taint_layers = Array.new
         case tnt
         when BaseTransformer
@@ -25,13 +24,18 @@ module ContextSanitization
         transformed_string = str
         taint_layers.each do |transform|
           transmethod = nil
-          puts "^^^^^ #{taint_layers} - #{transform}"
+#          puts "^^^^^ #{taint_layers} - #{transform}"
           if !transform.state.has_key?(:HTML)
             puts "Transformer is missing an HTML transformation.  Skipping..."
           else
             transmethod = hash_recurse(transform.state[:HTML], new_text, index, str)
-            puts "!!!!!!!!!!!! #{transmethod} -- #{transmethod.nil?}"
+            if transmethod.is_a?(Symbol)
+              transmethod = eval("TaintTypes::#{transmethod.to_s}.new")
+            end
+ #           puts "!!!!!!!!!!!! #{transmethod.inspect} -- #{transmethod.nil?}"
+            puts transformed_string
             transformed_string = transmethod.safe_class.sanitize(transformed_string)
+            puts transformed_string
           end
         end
         new_string += transformed_string.set_taint(tnt)

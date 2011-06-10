@@ -64,7 +64,12 @@ class Object
 
   def assign_policy(policy_type, function, target=:self, owner=self, field="")
     if policy_type == :taint
-     
+      if !self.nil?
+        t_hash = eval(function)      
+        new_str = TaintSystem::taint_field(self,:HTML, t_hash[:HTML])
+        #puts "Resulting Taint: #{new_str.taint.inspect}"
+        self.taint = new_str.taint
+      end
     else
       if !self.frozen?
         @policy_object = {} if policy_object.nil?

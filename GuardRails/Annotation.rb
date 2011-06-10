@@ -47,14 +47,14 @@ class Annotation
     if args[-1].is_a? Symbol
       find_lambda args[-1]
     elsif args[-1].is_a? Hash
-      find_lambda args[-1].to_s
+      find_lambda args[-1].inspect
     else
       find_lambda str
     end
     if args.length>2
       @target=args[1]
     end
-    p @lambda.class
+#    p @lambda.class
   end
 
   def inspect
@@ -83,12 +83,14 @@ class Annotation
   # of annotations when one annotation is applied to multiple
   # targets.
   def deep_clone
-    #Marshal::load(Marshal.dump(self))
+    Marshal::load(Marshal.dump(self))
+=begin
     ans=Annotation.new
     ans.type=type
     ans.target=target
     ans.policy=policy
     ans.lambda=lambda
     return ans
+=end
   end
 end

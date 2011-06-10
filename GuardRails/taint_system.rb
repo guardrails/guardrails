@@ -11,6 +11,7 @@ module TaintSystem
   def self.taint_field(string, top_level, taint_hash)
     new_string = ""
     string.each_chunk do |str,tnt|
+#      puts "Str: #{str}, Tnt: #{tnt}"
       if ComposedTransformer === tnt 
         newTransformer = tnt.clone
         newTransformer.copy_clone!
@@ -20,10 +21,13 @@ module TaintSystem
         new_val = str.set_taint(new_taint)
         new_string += new_val
       else
+#        puts "uncomposed"
       # Ignore if nil, it's untainted      
         if tnt == nil || !tnt.state.has_key?(top_level) || tnt.state[top_level].nil?
+#          puts "nilly"
         new_string += str.set_taint(tnt)
         else
+#          puts "unnilly"
           new_taint = tnt.clone
           new_taint.state[top_level] = taint_hash
           new_val = str.set_taint(new_taint)
@@ -36,6 +40,12 @@ module TaintSystem
   class TaintTransformer
     def transform(string, top_level_context=nil, additional_context=nil)
       return TaintTypes::Identity.sanitize(string)
+    end
+  end
+  class RollbackTransformer < TaintTransformer
+    attr_accessor :backup
+    def transform(*args)
+      return @backup
     end
   end
   class ComposedTransformer < TaintTransformer
@@ -283,7 +293,7 @@ class Hash
         end        
       end
     end
-    return res
+   return res
   end
 end
 =end
@@ -383,9 +393,31 @@ class String
     end
     return new_string
   end
+
   def transform_HTML(additional_context = nil)
-    context_sanitize(self)
+    old_version = self.clone
+    new_self = self.clone
+    new_self = run_rollback(new_self)  
+    res = context_sanitize(new_self)
+    new_trans = RollbackTransformer.new
+    new_trans.backup = old_version       
+    res = res.set_taint(new_trans)
+    res
   end
+
+  def run_rollback(str)
+    new_str = ""
+    str.each_chunk do |val, tnt|
+      if tnt.is_a?(RollbackTransformer)
+        new_str += tnt.backup
+      else      
+        val = val.set_taint(tnt)
+        new_str += val
+      end
+    end
+    new_str
+  end
+
   def encode_taint
     new_taint = []
     @taint.each do |pair|
