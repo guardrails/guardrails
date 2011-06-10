@@ -25,11 +25,12 @@ fi
 # Put all models/controllers/helpers/views in a GuardRails folder
 echo "Copying GuardRails Tools..."
 cd ProdApps/$app_name/app
-mkdir -p GuardRails
-cp -R controllers GuardRails
-cp -R models GuardRails
-cp -R helpers GuardRails
-cp -R views GuardRails
+#mkdir -p GuardRails
+#cp -R controllers GuardRails
+#cp -R models GuardRails
+#cp -R helpers GuardRails
+#cp -R views GuardRails
+#cp -R ../lib GuardRails
 
 # Run GuardRails - CHANGE ruby1.9.1 to whatever ruby command you have installed
 cd ../../.. 
@@ -63,4 +64,4 @@ echo "Running..."
 # Make everything writable and run the app
 chmod 777 -R ProdApps/$app_name/
 cd ProdApps/$app_name
-./script/server
+
