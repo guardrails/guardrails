@@ -4,117 +4,135 @@ require 'GStringTransformer'
 require 'pp'
 
 class GTransformer
+  # Transformations that happen to all model files
+  def universal_transformations(ast)
+    ast = ast.insert_at_front(@parser.parse("require 'GObject'; require 'wrapper'"))
 
-	# Transformations that happen to all model files
-	def universal_transformations(ast)
-		ast = ast.insert_at_front(@parser.parse("require 'GObject'; require 'wrapper'"))
+    ast.insert_into_class! @parser.parse("unloadable"), true
+    ast.insert_into_class!(@parser.parse(
+    "include Wrapper; include Wrapper::WrapperMethods"), true)
+    ast.insert_into_class!(@parser.parse("public"))
+    ast.insert_into_class!(@parser.parse("define_attribute_methods"))
 
-		ast.insert_into_class! @parser.parse("unloadable"), true
-		ast.insert_into_class!(@parser.parse(
-				"include Wrapper; include Wrapper::WrapperMethods"), true)
-		ast.insert_into_class!(@parser.parse("public"))
-		ast.insert_into_class!(@parser.parse("define_attribute_methods"))
+    return ast
+  end
 
-		return ast
-	end
+  # Transformations to build the policy and violation hashes
+  def build_policy_objects(ast, ann_list)
+    return ast if ann_list.nil?
 
-	# Transformations to build the policy and violation hashes
-	def build_policy_objects(ast, ann_list)	
-		return ast if ann_list.nil?
+    function = "def populate_policies\n"
+    for ann in ann_list do
+      function += "#{ann.target}.assign_policy (:#{ann.policy}, '#{ann.lambda.to_s}', :self, self, '#{ann.target}')\n"
+    end
+    function += "end"
+    ast.insert_into_class!(@parser.parse(function))
 
-		function = "def populate_policies\n"
-		for ann in ann_list do
-                  function += "#{ann.target}.assign_policy (:#{ann.policy}, '#{ann.lambda.to_s}', :self, self, '#{ann.target}')\n"                 
-		end
-		function += "end"
-		ast.insert_into_class!(@parser.parse(function))
+    function = "def self.populate_policies\n"
+    for ann in ann_list do
+      if ann.type == :class
+        #                          puts "---- #{ann.lambda.inspect} + #{ann.lambda.class}"
+        function += "#{ann.target}.assign_policy (:#{ann.policy}, '#{ann.lambda.to_s}')\n"
+      end
+    end
+    function += "end"
+    ast.insert_into_class!(@parser.parse(function))
 
+    return ast
+  end
 
-		function = "def self.populate_policies\n"
-		for ann in ann_list do
-                        if ann.type == :class 
-#                          puts "---- #{ann.lambda.inspect} + #{ann.lambda.class}"
-                          function += "#{ann.target}.assign_policy (:#{ann.policy}, '#{ann.lambda.to_s}')\n"
-                        end
-		end
-		function += "end"
-		ast.insert_into_class!(@parser.parse(function))
+  # Transformations to enforce policies
+  def access_policy_transformations(ast)
+    ast.insert_into_class! @parser.parse("gr_policy_setup")
+    return ast
+  end
 
-		return ast
-	end
+  # Replaces all references to Models in target ast with a ModelProxyObject.
+  # We do this so we can intercept calls like [Model].find and [Model].delete
+  def insert_model_proxies(ast, model_list)
 
-	# Transformations to enforce policies
-	def access_policy_transformations(ast)
-		ast.insert_into_class! @parser.parse("gr_policy_setup")
-		return ast
-	end
+    for model_name in model_list
 
-	# Replaces all references to Models in target ast with a ModelProxyObject.
-	# We do this so we can intercept calls like [Model].find and [Model].delete
-	def insert_model_proxies(ast, model_list)
+      ast.replace2!(model_name.to_sym, "gr_#{model_name}".to_sym)
+      ast.insert_into_class! @parser.parse(
+      "def gr_#{model_name}; ModelProxy.new(#{model_name}); end")
+      ast.insert_into_class! @parser.parse(
+      "def self.gr_#{model_name}; ModelProxy.new(#{model_name}); end")
+      ast.insert_into_class! @parser.parse(
+      "#{model_name}.populate_policies")
+    end
+    return ast
+  end
 
-		for model_name in model_list
+#  def alter_library(ast, model_list)
+#    ast.insert_into_class! @parser.parse("require 'ProxyLibrary'")
+#    for model_name in model_list
+#      ast.replace!(model_name.to_sym, "gr_#{model_name}".to_sym)
+#    end
+#    return ast
+#  end
 
-			ast.replace!(model_name.to_sym, "gr_#{model_name}".to_sym)
-			ast.insert_into_class! @parser.parse(
-				"def gr_#{model_name}; ModelProxy.new(#{model_name}); end")
-			ast.insert_into_class! @parser.parse(
-				"def self.gr_#{model_name}; ModelProxy.new(#{model_name}); end")
-                        ast.insert_into_class! @parser.parse(
-                                                             "#{model_name}.populate_policies")
-		end
-		return ast
-	end
+  def transform(asts, ann_lists, model_names, model_filenames)
+    @parser = RubyParser.new
 
-	def transform(asts, ann_lists, model_names, model_filenames)
-		@parser = RubyParser.new	  
-	
-		# Transform the models to have policy mappings and such
-		for filename in asts[:model].keys do
+    # Transform the models to have policy mappings and such
+    for filename in asts[:model].keys do
 
-			# Only transform models that extend ActiveRecord::Base
-			next unless model_filenames.include? filename
+      # Only transform models that extend ActiveRecord::Base
+      next unless model_filenames.include? filename
 
-			ast = asts[:model][filename] 
-			ann_list = ann_lists[filename]
+      ast = asts[:model][filename]
+      ann_list = ann_lists[filename]
 
-			ast = universal_transformations(ast)
-			ast = build_policy_objects(ast, ann_list)
-			ast = access_policy_transformations(ast)
+      ast = universal_transformations(ast)
+      ast = build_policy_objects(ast, ann_list)
+      ast = access_policy_transformations(ast)
 
-			asts[:model][filename] = ast
-		end
+      asts[:model][filename] = ast
+    end
 
-		# Transform the controllers to include the proper files and have model proxies
-		for filename in asts[:controller].keys do
-			ast = asts[:controller][filename] 
-			ast = ast.insert_at_front(@parser.parse("require 'wrapper'"))
-			ast.insert_into_class!(@parser.parse(
-				"include Wrapper; include Wrapper::WrapperMethods"), true)
+    # Transform the controllers to include the proper files and have model proxies
+    for filename in asts[:controller].keys do
+      ast = asts[:controller][filename]
+      ast = ast.insert_at_front(@parser.parse("require 'wrapper'"))
+      ast.insert_into_class!(@parser.parse(
+      "include Wrapper; include Wrapper::WrapperMethods"), true)
 
-			ast.insert_into_class! @parser.parse("unloadable"), true
+      ast.insert_into_class! @parser.parse("unloadable"), true
 
-			ast = insert_model_proxies(ast, model_names)
+      ast = insert_model_proxies(ast, model_names)
 
-			asts[:controller][filename] = ast
-		end
+      asts[:controller][filename] = ast
+    end
 
-		# Application helper needs a new function
-		asts[:helper].insert_into_class! @parser.parse(
-			'def protect
+    for filename in asts[:library].keys do
+      puts "Now changing #{filename}"
+      ast=asts[:library][filename]
+      ast=insert_model_proxies(ast,model_names)
+      asts[:library][filename]=ast
+    end
+
+    # Application helper needs a new function
+    asts[:helper].insert_into_class! @parser.parse(
+    'def protect
     		 	yield
     			@output_buffer = @output_buffer.transform(:HTML)
 			 end')
 
-		# Handle taint tracking transformations
-		taint_tracking_transformations(asts)
+    # Handle taint tracking transformations
+    taint_tracking_transformations(asts)
 
-		# We need the models to have access to the authentication information so they can decide
-		# about authorization. 
-	#	app_control = @asts[:controller]['application_controller.rb']
-	#	app_control = @asts[:controller]['application.rb'] if app_control.nil?
-	#	app_control.insert_class_stmt @parser.parse("before_filter :pass_user"), true
-	#	app_control.insert_class_stmt @parser.parse(pass_user)
+    # Make a new
+    @proxlib=@parser.parse("module ProxyLibrary\nend")
+    insert_model_proxies(@proxlib,model_names)
+    asts[:proxylib]=@proxlib
 
-	end
+    # We need the models to have access to the authentication information so they can decide
+    # about authorization.
+    #	app_control = @asts[:controller]['application_controller.rb']
+    #	app_control = @asts[:controller]['application.rb'] if app_control.nil?
+    #	app_control.insert_class_stmt @parser.parse("before_filter :pass_user"), true
+    #	app_control.insert_class_stmt @parser.parse(pass_user)
+
+  end
 end

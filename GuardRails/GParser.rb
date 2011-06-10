@@ -101,11 +101,9 @@ class GParser
     ann = Annotation.new
 
     ann_src.slice!(Annotation_start_regex)
-    arr = ann_src.split(",") #TODO - split by something else
-    #ann.policy = arr[0].strip.to_sym
-    #ann.lambda = arr[-1].strip
+       
     begin
-      eval("ann.build(ann_src, "+ann_src+")");
+      eval("ann.build(ann_src,"+ann_src+")");
     rescue StandardError => msg
       puts "Invalid annotation..."
       puts msg
@@ -126,7 +124,7 @@ class GParser
       if !ann.target.nil?
         # If the optional field is included, its an attr annotation
         #        anns = []
-                ann.type = :attr
+        #        ann.type = :attr
         #        targets = arr[1..-2]
         #        targets.each { |tar|
         #          next_ann = ann.deep_clone
