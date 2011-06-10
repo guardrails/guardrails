@@ -74,9 +74,12 @@ class Object
       if !self.frozen?
         @policy_object = {} if policy_object.nil?
         @policy_object[policy_type] = function
+        puts "Owner.inspect #{owner.inspect}"
         if owner.is_a?(ActiveRecord::Base)
+          puts "Got in"
           owner.pps_init(field.intern)
           owner.plural_policy_store[field.intern][policy_type] = function
+          puts "\tPlural Policy#{owner.plural_policy_store.inspect}"
         end
       else
         if owner.is_a?(ActiveRecord::Base)
@@ -165,10 +168,15 @@ class Object
    						    target.assign_policy(:write_access, self.frozen_policy_store[:#{var}][:write_access])
 						      puts 'Attempting to Restore Policy'
 						      puts self.frozen_policy_store[:#{var}][:write_access]
-                  puts target.policy_object.inspect
 						    end
 						  end
-              self.send('old_#{var}=',val) if gr_can_edit? and target.gr_can_edit?
+              if gr_can_edit? and target.gr_can_edit?
+                return self.send('old_#{var}=',val)
+              elsif gr_can_append? and target.gr_can_append?
+                if target.gr_append_check? val
+                  return self.send('old_#{var}=',val)
+                end
+              end
 						end")
 
         self.class_eval("alias :old_#{var} :#{var}")
@@ -176,7 +184,7 @@ class Object
             define_method(:#{var}) do
 		 				  target = old_#{var}
 						  return if target.nil?
-              isproxy = target.respond_to?('target')
+              isproxy = target.respond_to?('proxy_reflection')
               if target.is_a?(Array)
                 new_array = visible_array(target)
                 if isproxy
@@ -200,5 +208,41 @@ class Object
       end
     end
   end
+  def gr_append_check? obj
+    return false if obj.class!=self.class
+    return false if !respond_to("each")
+    myEnum=to_enum
+    objEnum=obj.to_enum
+    while true
+      begin
+        myEle=myEnum.next
+      rescue
+        return true
+      end
+      begin
+        objEle=objEnum.next
+      rescue
+        return false
+      end
+      return false if myEle!=objEle
+    end
+    return true
+  end
 end
-
+class String
+  def gr_append_check? obj
+    return false if !obj.is_a? String
+    return obj[0...length]==self
+  end
+end
+class Hash
+  def gr_append_check? obj
+    return false if !obj.is_a? Hash
+    each_key do |k|
+      if !obj.has_key? k or self[k]!=obj[k]
+        return false
+      end
+    end
+    return true
+  end
+end
