@@ -33,6 +33,7 @@ class GTransformer
 		function = "def self.populate_policies\n"
 		for ann in ann_list do
                         if ann.type == :class 
+#                          puts "---- #{ann.lambda.inspect} + #{ann.lambda.class}"
                           function += "#{ann.target}.assign_policy (:#{ann.policy}, '#{ann.lambda.to_s}')\n"
                         end
 		end
