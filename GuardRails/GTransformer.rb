@@ -69,10 +69,10 @@ class GTransformer
 #    for model_name in model_list
 #      ast.replace!(model_name.to_sym, "gr_#{model_name}".to_sym)
 #    end
-#    return ast
+ #    return ast
 #  end
 
-  def transform(asts, ann_lists, model_names, model_filenames)
+  def transform(asts, ann_lists, model_names, model_filenames, pass_user)
     @parser = RubyParser.new
 
     # Transform the models to have policy mappings and such
@@ -85,9 +85,9 @@ class GTransformer
       ann_list = ann_lists[filename]
 
       ast = universal_transformations(ast)
+      ast=insert_model_proxies(ast,model_names)
       ast = build_policy_objects(ast, ann_list)
       ast = access_policy_transformations(ast)
-
       asts[:model][filename] = ast
     end
 
@@ -106,7 +106,6 @@ class GTransformer
     end
 
     for filename in asts[:library].keys do
-      puts "Now changing #{filename}"
       ast=asts[:library][filename]
       ast=insert_model_proxies(ast,model_names)
       asts[:library][filename]=ast
@@ -129,10 +128,10 @@ class GTransformer
 
     # We need the models to have access to the authentication information so they can decide
     # about authorization.
-    #	app_control = @asts[:controller]['application_controller.rb']
-    #	app_control = @asts[:controller]['application.rb'] if app_control.nil?
-    #	app_control.insert_class_stmt @parser.parse("before_filter :pass_user"), true
-    #	app_control.insert_class_stmt @parser.parse(pass_user)
+    app_control = asts[:controller]['application_controller.rb']
+    app_control = asts[:controller]['application.rb'] if app_control.nil?
+    app_control.insert_class_stmt @parser.parse("before_filter :pass_user"), true    
+    app_control.insert_class_stmt @parser.parse(pass_user)
 
   end
 end

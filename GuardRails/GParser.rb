@@ -37,10 +37,20 @@ class GParser
       @src = File.read(filename)
       @parser = RubyParser.new
       @lexer = @parser.lexer
-      @src_by_lines = @src.split(/\n|;/)
+      src_by_lines_help = @src.split(/\n/)
+      @src_by_lines=[]
+
+      for line in src_by_lines_help #Doesn't work with partial line comments with semicolons
+        if line =~ /^\s*#.*/
+          @src_by_lines << line
+        else
+          @src_by_lines += line.split(/;/)
+        end
+      end
+
       @is_erb = false
       @ann_list = []
-
+      
       # If the file is an html file with embedded ruby, we need to treat it
       # differently.  Instead, go inside and extract the ruby code from
       # the flags inside the file.

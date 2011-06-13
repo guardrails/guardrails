@@ -47,16 +47,17 @@ class GCompiler
     model_names = []
     model_files = []
     get_models(model_names, model_files)
-
+    
+    
+    config(dir)
     # Handle transformations
-    GTransformer.new.transform(@asts, ann_lists, model_names, model_files)
+    GTransformer.new.transform(@asts, ann_lists, model_names, model_files, @pass_user)
     # Rebuild the source code
     build_src(dir)
   end
 
   # Parse all of the relevant files
   def build_asts(dir)
-    puts dir
     # Build all models
     Find.find("#{dir}/app/models") do |path|
       next unless legal_file(path)
@@ -129,9 +130,7 @@ class GCompiler
 
     # Models
     for filename in @asts[:model].keys
-      puts filename
       path = get_path(filename)
-      puts path
       File.new("#{dir}/#{path}", 'w').puts(@ruby2ruby.process(@asts[:model][filename]))
     end
 
@@ -149,8 +148,7 @@ class GCompiler
     end
     
     # Libraries
-    for filename in @asts[:library].keys
-      puts "#{dir}/lib/#{filename}"
+    for filename in @asts[:library].keys      
       File.new("#{dir}/lib/#{filename}", 'w').puts(@ruby2ruby.process(@asts[:library][filename]))
     end
 
@@ -178,13 +176,14 @@ class GCompiler
       :plural_assoc_read, :plural_assoc_write]
 
     IO.foreach("#{dir}config/config.gr") do |line|
-      if line_index < 10
+      if line_index < 0
         @error_cases[arr[line_index]] = line.split("#")[0].strip
       else
         @pass_user << line << "\n"
       end
       line_index += 1
     end
+    @pass_user += "def pass_user\n Thread.current['user'] = return_user\n end"
   end
 
   def get_error_cases(filename)

@@ -4,9 +4,9 @@ require 'pp'
 require 'action_view'
 require 'ruby2ruby'
 
-include ActionView
-include Helpers
-include TextHelper
+#include ActionView
+#include Helpers
+#include TextHelper
 
 class GTransformer
 
