@@ -22,27 +22,17 @@ else
   exit 2
 fi
 
-# Put all models/controllers/helpers/views in a GuardRails folder
-echo "Copying GuardRails Tools..."
-cd ProdApps/$app_name/app
-mkdir -p GuardRails
-cp -R controllers GuardRails
-cp -R models GuardRails
-cp -R helpers GuardRails
-cp -R views GuardRails
-
 # Run GuardRails - CHANGE ruby1.9.1 to whatever ruby command you have installed
-cd ../../.. 
-cd GuardRails
+
 
 # Place Wrapper.rb, GActiveRecord.rb, GObject.rb in lib folder
 if [ ! -f "RawApps/$app_name/config/config.gr" ]
 then
   echo "Adding a Blank Config File..."
-  cd ..
   cp GuardRails/config.gr ProdApps/$app_name/config
-  cd GuardRails
 fi
+
+cd GuardRails
 
 echo "Transforming..."
 ruby GCompiler.rb ../ProdApps/$app_name/
@@ -59,8 +49,8 @@ cp GuardRails/taint_types.rb ProdApps/$app_name/lib
 cp GuardRails/extra_string.rb ProdApps/$app_name/lib
 cp GuardRails/context_sanitization.rb ProdApps/$app_name/lib
 
-echo "Running..."
 # Make everything writable and run the app
 chmod 777 -R ProdApps/$app_name/
 cd ProdApps/$app_name
-./script/server
+echo "Transformation Complete"
+

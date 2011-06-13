@@ -48,6 +48,11 @@ module TaintSystem
       return @backup
     end
   end
+  class IdentityTransformer < TaintTransformer
+    def transform(*args)
+      return args[0]
+    end
+  end
   class ComposedTransformer < TaintTransformer
     attr_accessor :transformers
     def initialize

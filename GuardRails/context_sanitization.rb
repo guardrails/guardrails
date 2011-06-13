@@ -26,16 +26,21 @@ module ContextSanitization
           transmethod = nil
 #          puts "^^^^^ #{taint_layers} - #{transform}"
           if !transform.state.has_key?(:HTML)
-            puts "Transformer is missing an HTML transformation.  Skipping..."
+#            puts "Transformer is missing an HTML transformation.  Skipping..."
           else
             transmethod = hash_recurse(transform.state[:HTML], new_text, index, str)
+#            puts "
             if transmethod.is_a?(Symbol)
               transmethod = eval("TaintTypes::#{transmethod.to_s}.new")
             end
  #           puts "!!!!!!!!!!!! #{transmethod.inspect} -- #{transmethod.nil?}"
-            puts transformed_string
+#            puts transformed_string
             transformed_string = transmethod.safe_class.sanitize(transformed_string)
-            puts transformed_string
+            if transformed_string.taint.nil?
+              index -= 1
+            end
+  #          puts "OUTPUT TAINT!!!: #{transformed_string.taint.inspect}"
+  #          puts transformed_string
           end
         end
         new_string += transformed_string.set_taint(tnt)
@@ -45,18 +50,27 @@ module ContextSanitization
     return new_string
   end
   def hash_recurse(hash, new_text, index, string)
+    #puts "Hash Recursing: #{hash.inspect}, #{new_text.inspect}, #{index.inspect}, #{string.inspect}"
+#    puts "Hash Recursing"
     themethod = nil
     default = nil
     hash.each_pair do |key, val|
+ #     puts "GO Pair #{key}, #{val}, Themethod:#{themethod.inspect}"
       if themethod.nil?
         if key != :DEFAULT
+  #        puts "Not Defualt - go #{key}"
           if taint_there?(new_text,key,index)          
+  #          puts "Taint There!"
             if Hash === val then
+  #            puts "H1"
               themethod = hash_recurse(val, new_text, index, string)
             else
+  #            puts "H2"
               themethod = val
             end
-          end
+          else
+ #           puts "Taint not there!"
+          end         
         end
       end
     end
@@ -64,7 +78,7 @@ module ContextSanitization
       if !hash.has_key?(:DEFAULT)
         raise StandardError, "Wanted to use :DEFAULT sanitization routine, but none was specified! String: #{string} - Hash: #{hash}"
       end
-      puts "Here's the hash: #{hash}"
+ #     puts "Here's the hash: #{hash}"
       themethod = hash[:DEFAULT]
     end
     return themethod
@@ -90,10 +104,14 @@ module ContextSanitization
   #Checks a Nokogiri tree for whether the given taint occurs in the tree at the
   #given xpath
   def taint_there?(str,xpath,index)
-    str.gsub($taint_marker,"") # Protect against people trying to match the taint_marker
+#    puts "TAINT INDEX: #{index}"
+    str.gsub($taint_marker,"") # Protect against people trying to match the taint_marker  
+#    puts "All Taint: #{index} ---- " + all_taint_before_index(str,index)
     matches = Nokogiri::HTML(all_taint_before_index(str,index)).xpath(xpath)
+#    puts "Matches:::: " + matches.inspect
     res = false
     matches.each do |m| 
+#      puts "Current State: #{res.inspect}, Looking at: #{m.inspect}"
       res = res || locate_taint(m)
     end
     res
@@ -106,13 +124,15 @@ module ContextSanitization
   # Recursively searches a Nokogiri XML tree to see if it can find $taint_marker
   # as an indicater that the taint is a descendent of the root node of the search
   def locate_taint(node)
+#    puts "recursing... At #{node.inspect}"
     ret = false
     node.children.each do |c|
-      ret = locate_taint(c)
+      ret = ret || locate_taint(c)
     end
     if ret
       return true
     end
+ #   puts "Last Checking #{node.type}"
     if node.attributes
       node.attributes.values.each do |a| # Attributes
         if a.value.include?($taint_marker) 
@@ -121,6 +141,7 @@ module ContextSanitization
       end
     end
     if node.type == 4 || node.type == 3 # Text and CDATA Nodes
+  #    puts "Here's the text #{node.text} vs. #{$taint_marker} -- #{node.text.include?($taint_marker)}"
       if node.text.include?($taint_marker)
         return true
       end

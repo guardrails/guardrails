@@ -37,10 +37,20 @@ class GParser
       @src = File.read(filename)
       @parser = RubyParser.new
       @lexer = @parser.lexer
-      @src_by_lines = @src.split(/\n|;/)
+      src_by_lines_help = @src.split(/\n/)
+      @src_by_lines=[]
+
+      for line in src_by_lines_help #Doesn't work with partial line comments with semicolons
+        if line =~ /^\s*#.*/
+          @src_by_lines << line
+        else
+          @src_by_lines += line.split(/;/)
+        end
+      end
+
       @is_erb = false
       @ann_list = []
-
+      
       # If the file is an html file with embedded ruby, we need to treat it
       # differently.  Instead, go inside and extract the ruby code from
       # the flags inside the file.
@@ -101,11 +111,9 @@ class GParser
     ann = Annotation.new
 
     ann_src.slice!(Annotation_start_regex)
-    arr = ann_src.split(",") #TODO - split by something else
-    #ann.policy = arr[0].strip.to_sym
-    #ann.lambda = arr[-1].strip
+       
     begin
-      eval("ann.build(ann_src, "+ann_src+")");
+      eval("ann.build(ann_src,"+ann_src+")");
     rescue StandardError => msg
       puts "Invalid annotation..."
       puts msg
@@ -126,7 +134,7 @@ class GParser
       if !ann.target.nil?
         # If the optional field is included, its an attr annotation
         #        anns = []
-                ann.type = :attr
+        #        ann.type = :attr
         #        targets = arr[1..-2]
         #        targets.each { |tar|
         #          next_ann = ann.deep_clone
