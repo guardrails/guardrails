@@ -22,15 +22,18 @@ GUARDRAILS SETUP:
 	4.  Go to RawApps/yourApp/config.  Copy the template "config.gr" from the root 
 	    of the GuardRails package and place them here.  You will want to edit these 
 	    for each application individually.
-	5.  To test your setup, in the root of the GuardRails package, execute the 
-	    "run.sh" shell script, passing in the name of the folder containing your 
-	    application in the RawApps directory:
- 
-    	    ~$ ./run.sh yourApp
+   	5.  To test your setup, in the root of the GuardRails package, execute the "run.sh" shell script,
+	    passing in the name of the folder containing your application in the RawApps directory:
+	        ~$ ./run.sh yourApp
+	6.  The GuardRails-modified version of your application can now be found in the ProdApps folder. 
+	    Run rake db:schema:load in your new application. This will reset the database, adding the 
+	    additional fields needed for taint tracking. Note that once an application is passed through 
+	    GuardRails, migrations should not be run on the "ProdApp" version as this will replace the 
+            modified schema file. 
 
    *** Refer to the USING_GAURDRAILS.txt file for more details on using features of GuardRails
 
-GEM MODIFICATIONS:
+GEM MODIFICATIONS (Improved explanation coming soon, this portion can be avoided for now):
 ------------------
 	Because string interpolation is only controlled by native Ruby code, it can potentially 
 	drop taint information.  For this reason, any cases of interpolation must be removed 
