@@ -1,0 +1,12 @@
+Group.create(:groupname => 'University of Virginia')
+Group.create(:groupname => 'University of Maryland')
+Group.create(:groupname => 'Team Google')
+Group.create(:groupname => 'Allen, Allen & Allen')
+RoleType.create(:typename => 'Administrator')
+RoleType.create(:typename => 'Group Leader')
+Permission.create(:permissionname => 'View Group Profile')
+Permission.create(:permissionname => 'Edit Group Profile')
+Permission.create(:permissionname => 'Delete Group')
+Permission.create(:permissionname => 'Remove Members')
+Permission.create(:permissionname => 'Remove Papers')
+

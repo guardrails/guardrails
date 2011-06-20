@@ -1,0 +1,29 @@
+<h1>New Group</h1>
+
+<% form_for(@group) do |f| %>
+  <%= f.error_messages %>
+
+  <p>
+    Group Name:<br />
+    <%= f.text_field :groupname %>
+  </p>
+  <p>
+    Description:<br />
+    <%= f.text_field :description %>
+  </p>
+  <% if (@admin == "0") %>
+    <p>
+      Profile:<br />
+   <%= f.text_area :profile %>
+   <%= hidden_field(:extra, :status, :value => "admin") %>
+  </p>
+  <% else %>
+  Your group will remain inactive pending administrator approval
+   <%= hidden_field(:extra, :status, :value => "wait") %>
+  <% end %>
+      <p>
+    <%= f.submit 'Create' %>
+  </p>
+<% end %>
+<div style="width: 60px; text-align: right">
+<%= link_to icon_link("back.png","Back"), groups_path %></div>

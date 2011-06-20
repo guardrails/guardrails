@@ -1,0 +1,6 @@
+<h2><%= @paper.title %></h2>
+  <%= @paper.author %> (<%= @paper.user.profile_link %>)
+<br><br>View this paper:
+  <a href="<%= @paper.url %>"><%= @paper.url %></a>
+<br><br>
+    <%= remote_graph("my_chart",{:route=>"/papers/citations_graph?id=" + @paper.id.inspect + "%26points=13", :width => 400, :height => 250}) %>

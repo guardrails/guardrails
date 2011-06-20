@@ -1,0 +1,60 @@
+{
+	"title": 
+		{
+			"text": "Bar Chart",
+			"style": "{font-size: 20px; color:#0000ff; font-family: Verdana; text-align: center;}"
+		},
+	"x_axis": 
+		{
+			"labels": 
+				{
+					"steps": 1
+				},
+			"offset": false,
+			"steps": 1,
+			"3d": 0
+		},
+	"y_axis": 
+		{
+			"tick-length": 0,
+			"offset": 0,
+			"steps": 3,
+			"min": 0,
+			"max": 24,
+			"3d": 0
+		},
+	"elements": 
+		[
+			{
+				"colour": "#345",
+				"values": 
+					[
+						0,
+						1,
+						3,
+						4,
+						5,
+						5,
+						9,
+						12,
+						8,
+						14,
+						14,
+						15
+					],
+				"font-size": 10,
+				"text": "Test",
+				"fillalpha": 0.4,
+				"alpha":0.5,
+				"type": "bar"
+			}
+		],
+	"tooltip": 
+		{
+			"text": "\u63D0\u793A:#val#",
+			"shadow": true,
+			"rounded": 1,
+			"stroke": 2,
+			"mouse": 0
+		}
+}

@@ -1,0 +1,33 @@
+<h2>User Profile: <%= @user.login %></h2>
+     <% if current_user.id == @user.id || current_user.authen_check("Administration","Edit User Profiles")%>
+       <div style="width: 55px; text-align: right;"><a href='/users/edit/<%= @user.id %>'><%= icon_link("edit.png","Edit") %></a></div>
+     <% end %>
+     <br><br>
+     <%= @user.login %>
+     <% if @user.groups.empty? %>
+            is not a member of any groups
+     <% else %>
+        is a member of
+       <% @count = 1 %>
+       <% @user.groups.each do |grp| %>
+            <% if @user.groups.size == @count %>
+               <%= grp.profile_link %>
+            <% else %>
+              <%= grp.profile_link %>,
+            <% end %>
+            <% @count += 1 %>
+       <% end %>
+   <% end %>
+  <br><br>
+<table>
+  <tr class="tableheader"><th>Papers:</th></tr>
+     <% if @user.papers.empty? %>
+            <tr><td>This user has no papers</td></tr>
+     <% else %>
+       <% @user.papers.each do |ppr| %>
+       <%= tr %><td><i><%= ppr.title %></i><br>by <%= ppr.author %> (<%= ppr.user.profile_link %>) <%= link_to image_tag("info.png", :style => "border:none;"), :controller => :papers, :action => :show, :id => ppr.id %></td></tr>
+       <% end %>
+   <% end %>
+</table>
+<br><hr>
+  <%= @user.profile %>

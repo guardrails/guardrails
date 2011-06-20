@@ -1,0 +1,96 @@
+<style type="text/css">
+input {
+ width: 100%
+}
+textarea {
+ width: 100%
+}
+</style>
+<h1>Editing group</h1>
+<% form_for(@group) do |f| %>
+  <%= f.error_messages %>
+<table>
+<tr>
+<td style="width: 400px">
+<table>
+<tr class="tableheader"><th>Group Properties</th></tr>
+<tr>
+<td>
+  <p>
+    Group Name:<br />
+    <% if current_user.authen_check("Administration", "Modify Groups") %>
+      <%= f.text_field :groupname %>
+    <% else %>
+           <%= @group.groupname %>
+      <%= f.hidden_field :groupname %>
+    <% end %>
+  </p>
+  <p>
+    Description:<br />
+    <% if (current_user.authen_check("Administration","Modify Groups") || current_user.authen_check(@group.groupname,"Edit Group Profile")) %>
+     <%= f.text_field :description %>
+    <% else %>
+     <%= @group.description %>
+   <% end %>
+  </p>
+  <p>
+    Profile:<br />
+  <% if (current_user.authen_check("Administration","Modify Groups") || current_user.authen_check(@group.groupname,"Edit Group Profile")) %>
+   <%= f.text_area :profile  %>
+   <% else %>
+   <hr>
+   <%= @group.profile %>
+   <hr>
+   <% end %>
+  </p>
+  <p>
+    <% if (current_user.authen_check("Administration","Modify Groups") || current_user.authen_check(@group.groupname,"Edit Group Profile")) %>
+    <%= f.submit 'Update'%>
+    <% end %>
+  </p>
+</td>
+</tr>
+</table>
+<% end %>
+</td>
+<td style="width: 30px"></td>
+<td style="vertical-align:text-top; width: 250px;">
+<table>
+<tr class="tableheader"><th colspan=5>Users</th></tr>
+<% if @group.users.empty? %>
+<tr><td>This group has no users</td></tr>
+<% else %>
+<% @group.users.each do |usr| %>
+      <tr><td><%= usr.login %></td><td style="text-align:right; width: 90px">
+    <% if current_user.authen_check(@group.groupname,"Remove Members") ||
+          current_user.authen_check("Administration", "Modify Groups")%>
+    <%= link_to icon_link("delete.png","Remove"), :action => 'remove_user',
+         :id => usr.id.inspect, :id2 => @group.id.inspect %>
+    <% end %>
+</td></tr>
+<% end %>
+<% end %>
+ </table>
+<br><br>
+<% if current_user.authen_check(@group.groupname, "Control Group Roles") %>
+   <a href="/roles/<%= @group.id %>"><%= icon_link("properties.png", "Modify Roles") %></a>
+<% end %>
+</td>
+<td>
+</td>
+</tr>
+</table>
+<table style="width: auto">
+<tr>
+<td style="width: 57px; text-align: right;">
+<% if current_user.authen_check("Administration","Modify Groups") %>
+<%= link_to icon_link("back.png","Back"), groups_path %>
+<% else %>
+<%= link_to icon_link("back.png","Back"), joinGroup_path %>
+<% end %>
+</td>
+<td>
+<%= link_to 'Show', @group %>
+</td>
+</tr>
+</table>

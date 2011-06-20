@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Font Name="宋体" Size="9" />
+  <Class Name="OpenFlashChart.Chart&lt;T&gt;" Collapsed="true">
+    <Position X="5.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>Chart.cs</FileName>
+      <HashCode>UAACAAAAAAAAAAAAAAAAAQAAAAEBACAKAAAoChAAACg=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OpenFlashChart.BarSketch" Collapsed="true">
+    <Position X="6.5" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>BarSketch.cs</FileName>
+      <HashCode>AACAAAAAAAAAAAAEAAAAAAAAAAQAAAAAAAAAAAAAgAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OpenFlashChart.PieValue" Collapsed="true">
+    <Position X="4.25" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>Pie.cs</FileName>
+      <HashCode>AAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAIAAAgCAAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OpenFlashChart.Pie" Collapsed="true">
+    <Position X="4.25" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>Pie.cs</FileName>
+      <HashCode>EIAAAAAAAAAAAAAAAEAAAARAAAAEABAAAAAQAIAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+</ClassDiagram>

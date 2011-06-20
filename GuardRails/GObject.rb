@@ -1,5 +1,6 @@
 # We need to give all objects some built in fields and methods so we
 # modify the object class here.
+#require "ActiveRecord"
 class ActiveRecord::Base
   attr_accessor :frozen_policy_store, :plural_policy_store
   def frozen_policy_store
@@ -32,8 +33,10 @@ class ActiveRecord::Base
       raise GuardRailsError, "Not Authorized to Destroy Object"
     end
   end
-
+  begin
   alias :old_delete :delete
+  rescue
+  end
 
   def delete
     if self.gr_can_destroy?
@@ -67,7 +70,6 @@ class Object
       if !self.nil?
         t_hash = eval(function)      
         new_str = TaintSystem::taint_field(self,:HTML, t_hash[:HTML])
-        #puts "Resulting Taint: #{new_str.taint.inspect}"
         self.taint = new_str.taint
       end
     else
@@ -83,7 +85,6 @@ class Object
         end
       else
         if owner.is_a?(ActiveRecord::Base)
-          puts "I'm Frozen! Owner: #{owner}, Field: #{field}"
           owner.frozen_policy_store[field.intern] = {} if (owner.frozen_policy_store[field.intern].nil?)
           owner.frozen_policy_store[field.intern][policy_type] = function
         else
@@ -104,7 +105,16 @@ class Object
     return true if function.nil?
     return true if Thread.current['loopbreak'] == true
     Thread.current['loopbreak'] = true  
-    ret = eval(function).call(Thread.current['user'])
+    func = eval(function) 
+    if func.arity == 0
+	ret = eval(function).call
+    elsif func.arity == 1
+	ret = eval(function).call(Thread.current['user'])
+    elsif func.arity == 2
+	ret = eval(function).call(Thread.current['user'], Thread.current['response'])
+    else
+	raise GuardRailsError, "Annoation Requires Too Many Parameters"
+    end
     Thread.current['loopbreak'] = false
     ret
   end

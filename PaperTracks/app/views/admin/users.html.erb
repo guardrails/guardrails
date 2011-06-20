@@ -1,0 +1,17 @@
+<h1>Users</h1>
+<%= table_w_header(["User Name","Email"]) %>
+<% @users.each do |usr| %>
+<%= tr %>
+    <td style="padding: 5px;">
+     <%= usr.profile_link %>
+    </td>
+    <td>
+       <%= usr.email %>
+    </td>
+    <td style="text-align:right;width:150px;">
+      <a href="/admin/roles/<%= @group_id + '/' + usr.id.inspect %>">
+      <%= image_tag "properties.png", :size => "16x16", :class => "icon" %>
+      Manage Roles</a></td>
+    </tr>
+ <% end %>
+</table>

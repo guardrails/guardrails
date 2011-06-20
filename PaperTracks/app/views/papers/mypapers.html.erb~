@@ -1,0 +1,44 @@
+<%= table_w_sortheader(["Your Papers:"],"/mypapers",[["alpha","Alphabetically A->Z "],["alpha2","Alphabetically Z->A "],["b","By Date"],["cits","By Citations"],["fav","By Favorites"]]) %>
+  <tr><td colspan=5 style="text-align:right">Displaying <%= @display_index + 1 %>-<%=@papers.size + @display_index %> of <%= current_user.papers.size %> Papers</td></tr>
+  <% @papers.each do |paper| %>
+    <% @color = cycle('odd','even') %>
+    <tr class="<%= @color %>">
+     <td style="padding-left: 20px;">
+      <%= if paper.favorite
+            image_tag("favorite.png")
+          end %>
+      <i><%= paper.title %></i><br>
+      <%= paper.author %><br>
+      <%= paper.citations %> Citations &nbsp;<%= up_down_pic(paper) %><br><br>
+      <div style="float:right; padding-right:10px;">
+      <%= link_to image_tag("info2.png", :style => 'border:none'), :action => :show, :id => paper.id %>&nbsp;
+      <%= link_to image_tag("remove2.png", :style => 'border:none'), :action => :del, :id => paper.id, :sort => params[:sort] %>&nbsp;
+      <% if paper.favorite %>
+        <%= link_to image_tag("cancel2.png", :style => 'border:none'), :action => :remove_favorite, :id => paper.id, :sort => params[:sort] %>
+      <% else %>
+         <%= link_to image_tag("favorite2.png", :style => 'border:none'), :action => :make_favorite, :id => paper.id, :sort => params[:sort] %>
+      <% end %>
+    </div>
+     </td>
+    <td style="width: 10px;">
+    </td>
+    <td>
+    <%= remote_graph("my_chart" + paper.id.inspect,{:route=>"/papers/citations_graph?id=" + paper.id.inspect + "%26color=" + @color, :width => 300, :height => 150}) %>
+    </td>
+    </tr>
+  <% end %>
+</table>
+
+<center>
+<table>
+<tr>
+<% if @display_index-4 >= 0 %>
+<td style="width: 88px; text-align: right"><%= link_to icon_link("back.png","Previous"), :action => "mypapers", :sort => params[:sort], :index => (@display_index-4) %></td>
+<% end %>
+<td></td>
+<% if @display_index+4 < current_user.papers.size %>
+<td style="width: 60px;"><%= link_to image_tag("next.png", :style => "float:right; border:none") + "Next", :action => "mypapers", :sort => params[:sort], :index => (@display_index+4) %></td>
+<% end %>
+</tr>
+</table>
+</center>

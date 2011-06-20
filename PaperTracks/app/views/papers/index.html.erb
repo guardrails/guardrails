@@ -1,0 +1,11 @@
+<center><div class="special_table" style="width:370px;">
+<% form_for :paper, @paper, :url => { :action => "find_paper" }, :html => {:class => "nifty_form"} do |f| %>
+  Search for a Paper:
+<br><br>
+  <%= f.text_field :title, :style => "width:300px" %>
+  <%= submit_tag "Find" %>
+<% end %>
+</div><br>
+Powered by:<br>
+ <%= image_tag("gs_logo.gif", :style => "padding-top: 5px;") %>
+</center>

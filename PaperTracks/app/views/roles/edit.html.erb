@@ -1,0 +1,25 @@
+<h1>Editing Role</h1>
+
+<% form_for(@role) do |f| %>
+  <%= f.error_messages %>
+
+  <p>
+    Role Name:<br />
+    <%= f.text_field :rolename %>
+  </p>
+  <%= hidden_field(:extra, :redirectgroup, :value => @group_id) %>
+  <p>
+  <% @permissions.each do |prm| %>
+    <% if (prm.admin^!@role.group.admin) %>
+    <% if @group_id == "0" || current_user.authen_check(Group.find(@group_id).groupname, prm.permissionname) %>
+    <%= check_box(:perms, prm.id, :checked => @mypermissions.exists?(prm)) %> <%= prm.permissionname %><br>
+    <% end %>
+    <% end %>
+  <% end %>
+  </p>
+  <p>
+    <%= f.submit 'Update' %>
+  </p>
+<% end %>
+<div style="width: 60px; text-align: right">
+<%= link_to icon_link("back.png","Back"), :action => :show, :id => @group_id %></div>

@@ -1,0 +1,71 @@
+{
+  "elements": [
+    {
+      "type": "pie",
+      "alpha": 0.5,
+      "animate": [
+        {
+          "type": "fade"
+        },
+        {
+          "type": "bounce",
+          "distance": 5
+        }
+      ],
+      "start-angle": 0,
+      "tip": "#percent#",
+      "colours": [
+        "#d01f3c",
+        "#356aa0",
+        "#C79810"
+      ],
+      "values": [
+        {
+          "value": 0,
+          "label": "Spermicides"
+        },
+        {
+          "value": 1,
+          "label": "Safe period"
+        },
+        {
+          "value": 1,
+          "label": "Cap"
+        },
+        {
+          "value": 3,
+          "label": "Injection"
+        },
+        {
+          "value": 4,
+          "label": "Withdrawal"
+        },
+        {
+          "value": 5,
+          "label": "IUD"
+        },
+        {
+          "value": 19,
+          "label": "Condom"
+        },
+        {
+          "value": 21,
+          "label": "Sergical"
+        },
+        {
+          "value": 21,
+          "label": "None"
+        },
+        {
+          "value": 27,
+          "label": "Pill"
+        }
+      ]
+    }
+  ],
+  "title": {
+    "text": "Current use of contraception",
+    "style": "color: #f0f0f0; font-size: 20px"
+  },
+  "bg_colour": "#202020"
+}

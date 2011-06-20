@@ -44,13 +44,13 @@ class GParser
         if line =~ /^\s*#.*/
           @src_by_lines << line
         else
-          @src_by_lines += line.split(/;/)
+          @src_by_lines << line
         end
       end
 
       @is_erb = false
       @ann_list = []
-      
+
       # If the file is an html file with embedded ruby, we need to treat it
       # differently.  Instead, go inside and extract the ruby code from
       # the flags inside the file.
@@ -111,7 +111,7 @@ class GParser
     ann = Annotation.new
 
     ann_src.slice!(Annotation_start_regex)
-       
+
     begin
       eval("ann.build(ann_src,"+ann_src+")");
     rescue StandardError => msg
@@ -244,6 +244,7 @@ class GParser
     rb = ""
     # dunno how to deal with only leading declarations of ruby code,
     # so replace it with the other markings
+    src.gsub!(/-%>/,"%>")
     while	src.index(Embedded_ruby_line) != nil
       src.sub!(Embedded_ruby_line) { |match|
         match[match.index '%'] = " "
@@ -256,42 +257,88 @@ class GParser
     lines.each { |line|
       if (line.strip != "" and line.strip != nil)
         if is_ruby_line
-          if line[0] == '='
-            line[0] = " "
-            rb += "puts " + line.strip
+          if line[0,1] == '='
+            #            line[0] = " "
+            #            rb += "puts " + line.strip
+            rb+="gr_html_puts "+line.strip
           else
             rb += line.strip
           end
         else
-          rb += "gr_html(\"" + line + " gr_html\")"
+          rb += "gr_html( " + line.inspect + " )"
         end
         rb += "\n"
       end
       is_ruby_line = (not is_ruby_line)
     }
-    puts rb
+    #puts rb
     return rb
   end
 
-  def convert_to_erb(code)
-    code_by_words = code.split
-    code_by_words.insert(0, "<%")
-    inside_ruby_code = true
-    code_by_words.each_index{ |index|
-      if code_by_words[index].index('gr_html')
-        if inside_ruby_code
-          code_by_words[index] = "%>"
-        else
-          code_by_words[index] = "<%"
-        end
-        inside_ruby_code = (not inside_ruby_code)
-      end
-    }
-    code_by_words.push("%>")
-    code = code_by_words.join(" ")
-    return code
+  def convert_to_erb(exp)
+    translate_for_erb exp
+    ans="<% "+ErbProcessor.new.process(exp)+" %>"
+    ans.gsub! /<%\s*%>/,""
+    return ans
   end
 
+  private
+
+  class ErbProcessor < Ruby2Ruby
+    def initialize
+      super
+    end
+
+    def process_grhtml(exp)
+      #p exp
+      ans="%>"+exp[2][1][1]+"<%"
+      exp.shift until exp.empty?
+      return ans
+    end
+
+    def process_grhtmlputs(exp)
+      ans="%><%="+process(exp[1])+"%><%"
+      exp.shift until exp.empty?
+      return ans
+    end
+  end
+
+  def translate_for_erb(exp)
+    return unless exp.is_a? Sexp
+    if exp[0]==:call and exp[2]==:gr_html
+      exp[0]=:grhtml
+    elsif exp[0]==:lasgn and exp[1]==:gr_html_puts
+      exp[0]=:grhtmlputs
+    end
+    for i in exp
+      translate_for_erb(i)
+    end
+  end
+
+#  def process_block(exp)
+#    result = []
+#
+#    exp << nil if exp.empty?
+#    until exp.empty? do
+#      code = exp.shift
+#      if code.nil? or code.first == :nil then
+#        result << "# do nothing"
+#      else
+#        result << process(code)
+#      end
+#    end
+#
+#    result = result.join "%>\n<%"
+#
+#    result = case self.context[1]
+#    when nil, :scope, :if, :iter, :resbody, :when, :while then
+#      result + "\n"
+#    else
+#      "(#{result})"
+#    end
+#
+#    return result
+#  end
 end
 
 #pp GParser.new.get_annotations(ARGV[0])

@@ -1,0 +1,127 @@
+{
+	"title": 
+		{
+			"text": "line\u6F14\u793A",
+			"style": "{font-size: 20px; color:#0000ff; font-family: Verdana; text-align: center;}"
+		},
+
+	"elements": 
+		[
+			{
+				"width": 2,
+				"dot-size": 5,
+				"halo-size": 0,
+				"loop": false,
+				"tip": "\u63D0\u793A\uFF1A#val#",
+				"values": 
+					[
+						22,
+						9,
+						27,
+						11,
+						29,
+						22,
+						15,
+						15,
+						20,
+						7,
+						5,
+						11
+					],
+				"fillalpha": 0.35,
+				"type": "line_hollow"
+			}
+		],
+	"tooltip": 
+		{
+			"text": "\u5168\u5C40\u63D0\u793A\uFF1A#val#",
+			"shadow": true,
+			"rounded": 1,
+			"stroke": 2,
+			"colour": "#e43456",
+			"mouse": 0
+		},
+	"radar_axis": 
+		{
+			"labels": 
+				{
+					"labels": 
+						[
+							{
+								"text": "0",
+								"size": 12,
+								"visible": true
+							},
+							{
+								"text": "1",
+								"size": 12,
+								"visible": true
+							},
+							{
+								"text": "2",
+								"size": 12,
+								"visible": true
+							},
+							{
+								"text": "3",
+								"size": 12,
+								"visible": true
+							},
+							{
+								"text": "4",
+								"size": 12,
+								"visible": true
+							},
+							{
+								"text": "5",
+								"size": 12,
+								"visible": true
+							},
+							{
+								"text": "0",
+								"size": 12,
+								"visible": true
+							},
+							{
+								"text": "1",
+								"size": 12,
+								"visible": true
+							},
+							{
+								"text": "2",
+								"size": 12,
+								"visible": true
+							},
+							{
+								"text": "3",
+								"size": 12,
+								"visible": true
+							},
+							{
+								"text": "4",
+								"size": 12,
+								"visible": true
+							},
+							{
+								"text": "5",
+								"size": 12,
+								"visible": true
+							},
+							{
+								"text": "23",
+								"size": 12,
+								"visible": true
+							},
+							{
+								"text": "34",
+								"size": 12,
+								"visible": true
+							}
+						]
+				},
+			"offset": false,
+			"steps": 4,
+			"max": 30,
+			"3d": 0
+		}
+}

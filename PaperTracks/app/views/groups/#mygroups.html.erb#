@@ -1,0 +1,51 @@
+<div style="padding: 5px; padding-bottom: 15px;padding-left:0px;"><b>My Groups:</b></div>
+
+<%= table_w_header(["Name","c_Description"]) %>
+<% if @usergroups.empty? %>
+ <tr><td>You are not a member of any groups</td><td colspan=4></td>
+<% else %>
+  <% @usergroups.each do |grp| %>
+   <%= tr %>
+    <td style="width: 200px;">
+      <%= link_to grp.groupname, :action => 'show', :id => grp %>
+    </td>
+    <td style="padding-left: 50px;">
+      <%= grp.description %>
+    </td>
+    <td style="text-align: right; width: 73px;">
+      <%= link_to icon_link("delete.png","Leave"), :action => 'leave', :id => grp, :sort => params[:sort] %>
+    </td>
+   </tr>
+  <% end %>
+<% end %>
+</table><br>
+
+<div style="width: 185px; text-align: right;">
+<a href="/groups/new/"><%= icon_link("new.png","Create a New Group") %></a></div>
+<hr>
+<br>
+
+
+<div style="padding: 5px; padding-bottom: 15px;padding-left:0px;"><b>All Groups:</b></div>
+
+<%= table_w_sortheader(["Name","c_Description"],"/groups/mygroups",[["alpha","A->Z"],["alpha2","Z->A"]]) %>
+  <% @allgroups.each do |grp| %>
+   <% if !grp.admin && grp.approved %>
+     <%= tr %>
+       <td style="width: 200px;">
+         <%= link_to grp.groupname, :action => 'show', :id => grp %>
+       </td>
+       <td style="padding-left: 50px;">
+         <%= grp.description %>
+       </td>
+       <td style="text-align:left;width: 130px;">
+         <% if current_user.groups.find_by_groupname(grp.groupname) %>
+              Already a Member
+         <% else %>
+             <%= link_to icon_link("add.png","&nbsp; Join"), :action => 'join', :id => grp, :sort => params[:sort] %>
+         <% end %>
+      </td>
+   </tr>
+  <% end %>
+ <% end %>
+</table>

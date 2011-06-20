@@ -1,0 +1,7 @@
+<%= @paper.title %>
+<%= @paper.last_citations %>
+ <%= @paper.author %><br>
+  Here:
+<%= @paper.url %>
+
+ <li><%= link_to "Edit Paper", {:action => "edit", :id => @paper}, :method => :get if current_user == @paper.user %></li>

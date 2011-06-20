@@ -1,0 +1,16 @@
+<h1>Editing permission</h1>
+
+<% form_for(@permission) do |f| %>
+  <%= f.error_messages %>
+
+  <p>
+    <%= f.label :permissionname %><br />
+    <%= f.text_field :permissionname %>
+  </p>
+  <p>
+    <%= f.submit 'Update' %>
+  </p>
+<% end %>
+
+<%= link_to 'Show', @permission %> |
+<%= link_to 'Back', permissions_path %>

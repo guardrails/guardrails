@@ -1,0 +1,85 @@
+class AdminController < ApplicationController
+  include AuthenticatedSystem
+
+  before_filter :login_required
+  before_filter :admin_check, :except => [:roles, :users, :roleadd, :roleremove]
+  before_filter :group_access_check, :only => [:users, :roles, :roleadd, :roleremove]
+
+  layout 'admincore'
+
+  def show
+  end
+
+  def users
+    @users = User.all
+    if specific_group?
+      @users = @group.users
+    end
+    render :template => 'admin/users'
+  end
+
+  def roles
+    if specific_group?
+      @user_roles = @user.roles.find(:all, :conditions => ["group_id = ?", @group_id])
+      @roles = @group.roles
+    end
+    render :template => 'admin/roles'
+  end
+
+  def roleadd
+    @user.roles << Role.find(params[:id3])
+    if specific_group?
+      @user_roles = @user.roles.find(:all, :conditions => ["group_id = ?", @group_id])
+      @roles = @group.roles
+    end
+    render :template => 'admin/roles'
+  end
+
+  def roleremove
+    @targetrole = Role.find(params[:id3])
+    if @user.roles.exists?(@targetrole)
+        @user.roles.delete(@targetrole)
+    end
+    if specific_group?
+      @user_roles = @user.roles.find(:all, :conditions => ["group_id = ?", @group_id])
+      @roles = @group.roles
+    end
+    render :template => 'admin/roles'
+  end
+
+private
+  def admin_check
+    controller_check("Administration","Modify User Roles")
+  end
+
+  def group_access_check
+    # Define a bunch of common variables here to reduce redundency in the code
+      @roles = Role.all
+      @group_id = params[:id]
+      if specific_group?
+        @group = Group.find(@group_id)
+      end
+      if (params[:id2])
+        @user = User.find(params[:id2])
+        @user_roles = @user.roles
+      end
+    # ---------------------------------------------------------
+    if current_user.authen_check("Administration","Modify User Roles")
+      return true
+    end
+    if !@group_id || !specific_group?
+      controller_check("Administration","Modify User Roles")
+      return true
+    end
+    controller_check(@group.groupname,"Control Group Roles")
+  end
+
+  def specific_group?
+    if @group_id
+      return @group_id != "0"
+    end
+    @group_id = "0"
+    return false
+  end
+end
+

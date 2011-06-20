@@ -1,0 +1,16 @@
+<h1>New Permission</h1>
+
+<% form_for(@permission) do |f| %>
+  <%= f.error_messages %>
+
+  <p>
+    Permission Name:<br />
+    <%= f.text_field :permissionname %>
+  </p>
+  <p>
+    <%= f.submit 'Create' %>
+  </p>
+<% end %>
+
+<div style="width: 60px; text-align: right">
+<%= link_to icon_link("back.png","Back"), permissions_path %></div>

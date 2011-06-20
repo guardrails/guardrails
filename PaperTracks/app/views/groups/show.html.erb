@@ -1,0 +1,108 @@
+<% if !@group.approved %>
+  This Group is Inactive:<br><br>
+  <div style="border: 5px solid black; background-color: grey">
+<% end %>
+<center>
+  <h3>Group</h3>
+  <h2><%= @group.groupname %></h2><%= @group.description %><br><br>
+</center>
+<table style="width: 100%">
+  <tr>
+    <td style="width: 50%; vertical-align: text-top;">
+      <center>
+        <table>
+          <tr style="
+                   <% if @group.approved %>
+                      color:#ffffff;
+                   <% else %>
+                     color:grey;
+                   <% end %>
+                    background-color:#000000;">
+            <th style="padding: 4px;">Members:</th>
+         </tr>
+         <% if @group.users.empty? %>
+             <tr><td>This group does not have any users</td></tr>
+         <% else %>
+             <% @group.users.each do |usr| %>
+               <%= tr %><td><%=usr.profile_link%></td></tr>
+             <% end %>
+         <% end %>
+        </table>
+      </center>
+   </td>
+  <td style="vertical-align: text-top;">
+    <center>
+     <table>
+        <tr style="
+                <% if @group.approved %>
+                  color:#ffffff;
+                <% else %>
+                  color:grey;
+                <% end %>
+                  background-color:#000000;">
+          <th style="padding: 4px;">Top Papers:</th>
+       </tr>
+       <% if @gpapers.empty? %>
+          <%= tr %><td>No one in this group has a paper yet</td></tr>
+       <% else %>
+          <% @gpapers.each do |ppr| %>
+            <%= tr %><td><i><%= ppr.title %></i><br>by <%= ppr.author %> (<%= ppr.user.profile_link %>) &nbsp;
+<div style="float:right"><%= link_to image_tag("info.png", :style => "border:none;"), :controller => :papers, :action => :show, :id => ppr.id %></div></td></tr>
+          <% end %>
+       <% end %>
+     </table>
+    </center>
+  </td>
+ </tr>
+</table>
+
+<br>
+<hr>
+<%= @group.profile %>
+<hr>
+<br>
+<table>
+<tr>
+<td>
+<%= remote_graph("my_chart",{:route=>"/groups/papers_graph?id=" + @group.id.inspect, :width => 380, :height => 250}) %>
+</td>
+<td>
+<%= remote_graph("my_chart2",{:route=>"/groups/citations_graph?id=" + @group.id.inspect, :width => 380, :height => 250}) %>
+</td>
+</table><br><br>
+<table style="width: auto">
+<tr>
+<% if current_user %>
+   <% if current_user.authen_check(@group.groupname, "Edit Group Profile") ||
+       current_user.authen_check(@group.groupname, "Remove Members") ||
+       current_user.authen_check("Administration", "Modify Groups") %>
+      <td style="width: 54px; text-align: right;">
+      <%= link_to icon_link("edit.png","Edit"), edit_group_path(@group) %></td>
+   <% end %>
+   <% if current_user.authen_check(@group.groupname, "Control Group Roles") ||
+        current_user.authen_check("Administration", "Modify Groups")%>
+      <td style="width: 130px; text-align: right; padding-left: 15px;">
+     <%= link_to icon_link("properties.png","Manage Roles"), :controller => 'roles', :action => :show, :id => @group.id %></td>
+   <% end %>
+   <% if current_user.authen_check(@group.groupname, "Delete Group") ||
+       current_user.authen_check("Administration", "Modify Groups") %>
+      <td style="width: 126px; text-align: right; padding-left: 15px;">
+     <a href='/groups/destroy/<%= @group.id %>'>
+         <%= icon_link("remove.png","Delete Group") %></a></b></center></td>
+   <% end %>
+   <% if current_user.groups.find_by_groupname(@group.groupname) %>
+      <td style="text-align: right; width: 73px;">
+        <%= link_to icon_link("delete.png","Leave"), :action => 'leave', :id => @group.id %>
+      </td>
+    <% else %>
+      <td style="width:55px; text-align: right; padding-left: 20px;">
+        <%= link_to icon_link("add.png","Join"), :action => 'join', :id => @group.id %>
+      </td>
+   <% end %>
+<% end %>
+</tr>
+</table>
+
+<% if !@group.approved %>
+  </div>
+<% end %>

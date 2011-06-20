@@ -1,0 +1,214 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Font Name="宋体" Size="9" />
+  <Class Name="OpenFlashChart.AreaHollow" Collapsed="true">
+    <Position X="1.75" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>AreaHollow.cs</FileName>
+      <HashCode>AAAAAAAAAAQAAAAAQAAAAEAAAAAAAAAAAAAAAAAAAAQ=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OpenFlashChart.Axis" Collapsed="true">
+    <Position X="1.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>Axis.cs</FileName>
+      <HashCode>EAABEAABARAQAEAAEAAAAAIAAAoAAAAIAAgAABAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OpenFlashChart.AxisLabel" Collapsed="true">
+    <Position X="29" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>AxisLabel.cs</FileName>
+      <HashCode>EAAAAAAAAAAAgAAAAIAQAAIAEAAAAAAIAAAAiAAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OpenFlashChart.Bar" Collapsed="true">
+    <Position X="13" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>Bar.cs</FileName>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OpenFlashChart.Bar3D" Collapsed="true">
+    <Position X="17.5" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>Bar3D.cs</FileName>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OpenFlashChart.BarGlassValue" Collapsed="true">
+    <Position X="30.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>BarGlass.cs</FileName>
+      <HashCode>EAAAAAAAAAAAAAAAAAAAAAgAAAAIAAAAAAAAIBAAACA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OpenFlashChart.BarGlass" Collapsed="true">
+    <Position X="4" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>BarGlass.cs</FileName>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OpenFlashChart.BarSketch" Collapsed="true">
+    <Position X="8.5" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>BarSketch.cs</FileName>
+      <HashCode>AACAAAAAAAAAAAAEAAAAAAAAAAQAAAAAAAAAAAAAgAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OpenFlashChart.BarStackValue" Collapsed="true">
+    <Position X="32.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>BarStack.cs</FileName>
+      <HashCode>EAAAAIAAAACAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OpenFlashChart.BarStack" Collapsed="true">
+    <Position X="15.25" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>BarStack.cs</FileName>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OpenFlashChart.Chart&lt;T&gt;" Collapsed="true">
+    <Position X="14" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>Chart.cs</FileName>
+      <HashCode>UAACAAAAAAAAAAAAAAAAAQAAAAEBACAKAAAoChAAACg=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OpenFlashChart.ChartBase" Collapsed="true">
+    <Position X="14" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>ChartBase.cs</FileName>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAg=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OpenFlashChart.ChartElement" Collapsed="true">
+    <Position X="6.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>ChartElement.cs</FileName>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAIBAAACAAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OpenFlashChart.HBarValue" Collapsed="true">
+    <Position X="29" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>HBar.cs</FileName>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAACACAAAAAgAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OpenFlashChart.HBar" Collapsed="true">
+    <Position X="10.75" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>HBar.cs</FileName>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OpenFlashChart.Legend" Collapsed="true">
+    <Position X="7.75" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>Legend.cs</FileName>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OpenFlashChart.Line" Collapsed="true">
+    <Position X="26.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>Line.cs</FileName>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OpenFlashChart.LineBase" Collapsed="true">
+    <Position X="24.25" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>LineBase.cs</FileName>
+      <HashCode>AEAAAAAAAAQAAAAAQAAAAEAAAAAAAAAAAEAAAAAAAAQ=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OpenFlashChart.LineDot" Collapsed="true">
+    <Position X="22" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>LineDot.cs</FileName>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OpenFlashChart.LineHollow" Collapsed="true">
+    <Position X="24.25" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>LineHollow.cs</FileName>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OpenFlashChart.OpenFlashChart" Collapsed="true">
+    <Position X="30.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>OpenFlashChart.cs</FileName>
+      <HashCode>AAAAAAAAwAABAFAEAAAQAAAAEAAQAJAAGQAIAAkACAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OpenFlashChart.PieValue" Collapsed="true">
+    <Position X="32.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>Pie.cs</FileName>
+      <HashCode>AAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAIAAAgCAAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OpenFlashChart.Pie" Collapsed="true">
+    <Position X="19.75" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>Pie.cs</FileName>
+      <HashCode>EIAAAAAAAAAAAAAAAEAAAARAAAAEABAAAAAQAIAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OpenFlashChart.ScatterValue" Collapsed="true">
+    <Position X="29" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>Scatter.cs</FileName>
+      <HashCode>AAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAABgAAAAYAQ=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OpenFlashChart.Scatter" Collapsed="true">
+    <Position X="6.25" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>Scatter.cs</FileName>
+      <HashCode>AAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQ=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OpenFlashChart.Title" Collapsed="true">
+    <Position X="5.5" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>Title.cs</FileName>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OpenFlashChart.XAxis" Collapsed="true">
+    <Position X="0.5" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>XAxis.cs</FileName>
+      <HashCode>AACAAAAAEAAAABAAAAAAAAAAAAAAAIAAAABAAAgAgAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OpenFlashChart.XAxisLabels" Collapsed="true">
+    <Position X="30.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>XAxisLabels.cs</FileName>
+      <HashCode>EAABAAAAAQAAABAAAAAQAAIAEAAAAAAAAAAggAAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OpenFlashChart.YAxis" Collapsed="true">
+    <Position X="2.75" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>YAxis.cs</FileName>
+      <HashCode>ABCAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAgAAAgAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OpenFlashChart.YAxisRight" Collapsed="true">
+    <Position X="2.75" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>YAxisRight.cs</FileName>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+</ClassDiagram>

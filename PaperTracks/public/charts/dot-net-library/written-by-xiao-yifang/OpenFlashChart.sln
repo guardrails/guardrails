@@ -1,0 +1,96 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenFlashChart", "OpenFlashChart\OpenFlashChart.csproj", "{213ABC3E-F51E-4A09-A053-BC17E4797BA8}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+EndProject
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "F:\...\ofcWebTest\", "ofcWebTest\", "{AD4F2CE2-196C-4E9B-94EA-ACB21CBCFE3F}"
+	ProjectSection(WebsiteProperties) = preProject
+		ProjectReferences = "{213ABC3E-F51E-4A09-A053-BC17E4797BA8}|OpenFlashChart.dll;"
+		Debug.AspNetCompiler.VirtualPath = "/ofcWebTest"
+		Debug.AspNetCompiler.PhysicalPath = "ofcWebTest\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\ofcWebTest\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/ofcWebTest"
+		Release.AspNetCompiler.PhysicalPath = "ofcWebTest\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\ofcWebTest\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		VWDPort = "6666"
+		VWDDynamicPort = "false"
+	EndProjectSection
+EndProject
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "F:\...\ofcHandlerWeb\", "ofcHandlerWeb\", "{B47F3D8B-F653-407D-B081-8AF35AF95C83}"
+	ProjectSection(WebsiteProperties) = preProject
+		ProjectReferences = "{213ABC3E-F51E-4A09-A053-BC17E4797BA8}|OpenFlashChart.dll;"
+		Debug.AspNetCompiler.VirtualPath = "/ofcHandlerWeb"
+		Debug.AspNetCompiler.PhysicalPath = "ofcHandlerWeb\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\ofcHandlerWeb\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/ofcHandlerWeb"
+		Release.AspNetCompiler.PhysicalPath = "ofcHandlerWeb\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\ofcHandlerWeb\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		VWDPort = "1779"
+		DefaultWebSiteLanguage = "Visual C#"
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|.NET = Debug|.NET
+		Debug|Any CPU = Debug|Any CPU
+		Debug|Mixed Platforms = Debug|Mixed Platforms
+		Release|.NET = Release|.NET
+		Release|Any CPU = Release|Any CPU
+		Release|Mixed Platforms = Release|Mixed Platforms
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{213ABC3E-F51E-4A09-A053-BC17E4797BA8}.Debug|.NET.ActiveCfg = Debug|Any CPU
+		{213ABC3E-F51E-4A09-A053-BC17E4797BA8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{213ABC3E-F51E-4A09-A053-BC17E4797BA8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{213ABC3E-F51E-4A09-A053-BC17E4797BA8}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{213ABC3E-F51E-4A09-A053-BC17E4797BA8}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{213ABC3E-F51E-4A09-A053-BC17E4797BA8}.Release|.NET.ActiveCfg = Release|Any CPU
+		{213ABC3E-F51E-4A09-A053-BC17E4797BA8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{213ABC3E-F51E-4A09-A053-BC17E4797BA8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{213ABC3E-F51E-4A09-A053-BC17E4797BA8}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{213ABC3E-F51E-4A09-A053-BC17E4797BA8}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{AD4F2CE2-196C-4E9B-94EA-ACB21CBCFE3F}.Debug|.NET.ActiveCfg = Debug|.NET
+		{AD4F2CE2-196C-4E9B-94EA-ACB21CBCFE3F}.Debug|.NET.Build.0 = Debug|.NET
+		{AD4F2CE2-196C-4E9B-94EA-ACB21CBCFE3F}.Debug|Any CPU.ActiveCfg = Debug|.NET
+		{AD4F2CE2-196C-4E9B-94EA-ACB21CBCFE3F}.Debug|Mixed Platforms.ActiveCfg = Debug|.NET
+		{AD4F2CE2-196C-4E9B-94EA-ACB21CBCFE3F}.Debug|Mixed Platforms.Build.0 = Debug|.NET
+		{AD4F2CE2-196C-4E9B-94EA-ACB21CBCFE3F}.Release|.NET.ActiveCfg = Debug|.NET
+		{AD4F2CE2-196C-4E9B-94EA-ACB21CBCFE3F}.Release|.NET.Build.0 = Debug|.NET
+		{AD4F2CE2-196C-4E9B-94EA-ACB21CBCFE3F}.Release|Any CPU.ActiveCfg = Debug|.NET
+		{AD4F2CE2-196C-4E9B-94EA-ACB21CBCFE3F}.Release|Mixed Platforms.ActiveCfg = Debug|.NET
+		{AD4F2CE2-196C-4E9B-94EA-ACB21CBCFE3F}.Release|Mixed Platforms.Build.0 = Debug|.NET
+		{B47F3D8B-F653-407D-B081-8AF35AF95C83}.Debug|.NET.ActiveCfg = Debug|.NET
+		{B47F3D8B-F653-407D-B081-8AF35AF95C83}.Debug|.NET.Build.0 = Debug|.NET
+		{B47F3D8B-F653-407D-B081-8AF35AF95C83}.Debug|Any CPU.ActiveCfg = Debug|.NET
+		{B47F3D8B-F653-407D-B081-8AF35AF95C83}.Debug|Mixed Platforms.ActiveCfg = Debug|.NET
+		{B47F3D8B-F653-407D-B081-8AF35AF95C83}.Debug|Mixed Platforms.Build.0 = Debug|.NET
+		{B47F3D8B-F653-407D-B081-8AF35AF95C83}.Release|.NET.ActiveCfg = Debug|.NET
+		{B47F3D8B-F653-407D-B081-8AF35AF95C83}.Release|.NET.Build.0 = Debug|.NET
+		{B47F3D8B-F653-407D-B081-8AF35AF95C83}.Release|Any CPU.ActiveCfg = Debug|.NET
+		{B47F3D8B-F653-407D-B081-8AF35AF95C83}.Release|Mixed Platforms.ActiveCfg = Debug|.NET
+		{B47F3D8B-F653-407D-B081-8AF35AF95C83}.Release|Mixed Platforms.Build.0 = Debug|.NET
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,706 @@
+
+  
+  
+
+  
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+        <title>peterpunk's open_flash_chart_lazy at master - GitHub</title>
+    <link rel="search" type="application/opensearchdescription+xml" href="/opensearch.xml" title="GitHub" />
+    <link rel="fluid-icon" href="http://github.com/fluidicon.png" title="GitHub" />
+
+    <link href="http://assets2.github.com/stylesheets/bundle_common.css?8b7d51c78c92a7e4c4734ae9042a021682b5af00" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://assets1.github.com/stylesheets/bundle_github.css?8b7d51c78c92a7e4c4734ae9042a021682b5af00" media="screen" rel="stylesheet" type="text/css" />
+
+    <script type="text/javascript" charset="utf-8">
+      var GitHub = {}
+      var github_user = null
+      
+    </script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js" type="text/javascript"></script>
+    <script src="http://assets0.github.com/javascripts/bundle_common.js?8b7d51c78c92a7e4c4734ae9042a021682b5af00" type="text/javascript"></script>
+<script src="http://assets0.github.com/javascripts/bundle_github.js?8b7d51c78c92a7e4c4734ae9042a021682b5af00" type="text/javascript"></script>
+
+        <script type="text/javascript" charset="utf-8">
+      GitHub.spy({
+        repo: "peterpunk/open_flash_chart_lazy"
+      })
+    </script>
+
+    
+  
+    
+  
+
+  <link href="http://github.com/peterpunk/open_flash_chart_lazy/commits/master.atom" rel="alternate" title="Recent Commits to open_flash_chart_lazy:master" type="application/atom+xml" />
+
+        <meta name="description" content="A Rails plugin to use open_flash_chart version 2" />
+    <script type="text/javascript">
+      GitHub.nameWithOwner = GitHub.nameWithOwner || "peterpunk/open_flash_chart_lazy";
+      GitHub.currentRef = "master";
+    </script>
+  
+
+            <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-3769691-2']);
+      _gaq.push(['_trackPageview']);
+      (function() {
+        var ga = document.createElement('script');
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        ga.setAttribute('async', 'true');
+        document.documentElement.firstChild.appendChild(ga);
+      })();
+    </script>
+
+  </head>
+
+  
+
+  <body>
+    
+
+    
+      <script type="text/javascript">
+        var _kmq = _kmq || [];
+        (function(){function _kms(u,d){if(navigator.appName.indexOf("Microsoft")==0 && d)document.write("<scr"+"ipt defer='defer' async='true' src='"+u+"'></scr"+"ipt>");else{var s=document.createElement('script');s.type='text/javascript';s.async=true;s.src=u;(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);}}_kms('https://i.kissmetrics.com/i.js');_kms('http'+('https:'==document.location.protocol ? 's://s3.amazonaws.com/' : '://')+'scripts.kissmetrics.com/406e8bf3a2b8846ead55afb3cfaf6664523e3a54.1.js',1);})();
+      </script>
+    
+
+    
+
+    
+
+    <div class="subnavd" id="main">
+      <div id="header" class="pageheaded">
+        <div class="site">
+          <div class="logo">
+            <a href="http://github.com"><img src="/images/modules/header/logov3.png" alt="github" /></a>
+          </div>
+          
+          <div class="topsearch">
+  
+    <form action="/search" id="top_search_form" method="get">
+      <a href="/search" class="advanced-search tooltipped downwards" title="Advanced Search">Advanced Search</a>
+      <input type="search" class="search my_repos_autocompleter" name="q" results="5" placeholder="Search&hellip;" /> <input type="submit" value="Search" class="button" />
+      <input type="hidden" name="type" value="Everything" />
+      <input type="hidden" name="repo" value="" />
+      <input type="hidden" name="langOverride" value="" />
+      <input type="hidden" name="start_value" value="1" />
+    </form>
+  
+  
+    <ul class="nav logged_out">
+      
+        <li><a href="http://github.com">Home</a></li>
+        <li class="pricing"><a href="/plans">Pricing and Signup</a></li>
+        <li><a href="http://github.com/explore">Explore GitHub</a></li>
+        
+        <li><a href="/blog">Blog</a></li>
+      
+      <li><a href="https://github.com/login">Login</a></li>
+    </ul>
+  
+</div>
+
+        </div>
+      </div>
+
+      
+      
+        
+    <div class="site">
+      <div class="pagehead repohead vis-public   ">
+        <h1>
+          <a href="/peterpunk">peterpunk</a> / <strong><a href="http://github.com/peterpunk/open_flash_chart_lazy">open_flash_chart_lazy</a></strong>
+          
+          
+        </h1>
+
+        
+    <ul class="actions">
+      
+
+      
+        <li class="for-owner" style="display:none"><a href="https://github.com/peterpunk/open_flash_chart_lazy/edit" class="minibutton btn-admin "><span><span class="icon"></span>Admin</span></a></li>
+        <li>
+          <a href="/peterpunk/open_flash_chart_lazy/toggle_watch" class="minibutton btn-watch " id="watch_button" style="display:none"><span><span class="icon"></span>Watch</span></a>
+          <a href="/peterpunk/open_flash_chart_lazy/toggle_watch" class="minibutton btn-watch " id="unwatch_button" style="display:none"><span><span class="icon"></span>Unwatch</span></a>
+        </li>
+        
+          
+            <li class="for-notforked" style="display:none"><a href="/peterpunk/open_flash_chart_lazy/fork" class="minibutton btn-fork " id="fork_button" onclick="var f = document.createElement('form'); f.style.display = 'none'; this.parentNode.appendChild(f); f.method = 'POST'; f.action = this.href;var s = document.createElement('input'); s.setAttribute('type', 'hidden'); s.setAttribute('name', 'authenticity_token'); s.setAttribute('value', '24754495d3ee87daabd4850d62d366dccc8650ba'); f.appendChild(s);f.submit();return false;"><span><span class="icon"></span>Fork</span></a></li>
+            <li class="for-hasfork" style="display:none"><a href="#" class="minibutton btn-fork " id="your_fork_button"><span><span class="icon"></span>Your Fork</span></a></li>
+          
+          <li id="pull_request_item" style="display:none"><a href="/peterpunk/open_flash_chart_lazy/pull_request/" class="minibutton btn-pull-request "><span><span class="icon"></span>Pull Request</span></a></li>
+          <li><a href="#" class="minibutton btn-download " id="download_button"><span><span class="icon"></span>Download Source</span></a></li>
+        
+      
+      
+      <li class="repostats">
+        <ul class="repo-stats">
+          <li class="watchers"><a href="/peterpunk/open_flash_chart_lazy/watchers" title="Watchers" class="tooltipped downwards">33</a></li>
+          <li class="forks"><a href="/peterpunk/open_flash_chart_lazy/network" title="Forks" class="tooltipped downwards">3</a></li>
+        </ul>
+      </li>
+    </ul>
+
+
+        
+  <ul class="tabs">
+    <li><a href="http://github.com/peterpunk/open_flash_chart_lazy/tree/master" class="selected" highlight="repo_source">Source</a></li>
+    <li><a href="http://github.com/peterpunk/open_flash_chart_lazy/commits/master" highlight="repo_commits">Commits</a></li>
+
+    
+    <li><a href="/peterpunk/open_flash_chart_lazy/network" highlight="repo_network">Network (3)</a></li>
+
+    
+
+    
+      
+      <li><a href="/peterpunk/open_flash_chart_lazy/issues" highlight="issues">Issues (0)</a></li>
+    
+
+    
+      
+      <li><a href="/peterpunk/open_flash_chart_lazy/downloads">Downloads (0)</a></li>
+    
+
+    
+      
+      <li><a href="http://wiki.github.com/peterpunk/open_flash_chart_lazy/">Wiki (1)</a></li>
+    
+
+    <li><a href="/peterpunk/open_flash_chart_lazy/graphs" highlight="repo_graphs">Graphs</a></li>
+
+    <li class="contextswitch nochoices">
+      <span class="toggle leftwards" >
+        <em>Branch:</em>
+        <code>master</code>
+      </span>
+    </li>
+  </ul>
+
+  <div style="display:none" id="pl-description"><p><em class="placeholder">click here to add a description</em></p></div>
+  <div style="display:none" id="pl-homepage"><p><em class="placeholder">click here to add a homepage</em></p></div>
+
+  <div class="subnav-bar">
+  
+  <ul>
+    <li>
+      <a href="#" class="dropdown">Switch Branches (4)</a>
+      <ul>
+        
+          
+          
+            <li><a href="/peterpunk/open_flash_chart_lazy/tree/compatibility_improved" action="show">compatibility_improved</a></li>
+          
+        
+          
+            <li><strong>master &#x2713;</strong></li>
+            
+          
+          
+            <li><a href="/peterpunk/open_flash_chart_lazy/tree/rails3" action="show">rails3</a></li>
+          
+        
+          
+          
+            <li><a href="/peterpunk/open_flash_chart_lazy/tree/unified" action="show">unified</a></li>
+          
+        
+      </ul>
+    </li>
+    <li>
+      <a href="#" class="dropdown defunct">Switch Tags (0)</a>
+      
+    </li>
+    <li>
+    
+    <a href="/peterpunk/open_flash_chart_lazy/branches" class="manage">Branch List</a>
+    
+    </li>
+  </ul>
+</div>
+
+  
+  
+  
+  
+  
+
+
+        
+    <div id="repo_details" class="metabox clearfix">
+      <div id="repo_details_loader" class="metabox-loader" style="display:none">Sending Request&hellip;</div>
+
+      
+
+      <div id="repository_description" rel="repository_description_edit">
+        
+          <p>A Rails plugin to use open_flash_chart version 2
+            <span id="read_more" style="display:none">&mdash; <a href="#readme">Read more</a></span>
+          </p>
+        
+      </div>
+      <div id="repository_description_edit" style="display:none;" class="inline-edit">
+        <form action="/peterpunk/open_flash_chart_lazy/edit/update" method="post"><div style="margin:0;padding:0"><input name="authenticity_token" type="hidden" value="24754495d3ee87daabd4850d62d366dccc8650ba" /></div>
+          <input type="hidden" name="field" value="repository_description">
+          <input type="text" class="textfield" name="value" value="A Rails plugin to use open_flash_chart version 2">
+          <div class="form-actions">
+            <button class="minibutton"><span>Save</span></button> &nbsp; <a href="#" class="cancel">Cancel</a>
+          </div>
+        </form>
+      </div>
+
+      
+      <div class="repository-homepage" id="repository_homepage" rel="repository_homepage_edit">
+        <p><a href="http://ofcl.onrails.com.ar/" rel="nofollow">http://ofcl.onrails.com.ar/</a></p>
+      </div>
+      <div id="repository_homepage_edit" style="display:none;" class="inline-edit">
+        <form action="/peterpunk/open_flash_chart_lazy/edit/update" method="post"><div style="margin:0;padding:0"><input name="authenticity_token" type="hidden" value="24754495d3ee87daabd4850d62d366dccc8650ba" /></div>
+          <input type="hidden" name="field" value="repository_homepage">
+          <input type="text" class="textfield" name="value" value="http://ofcl.onrails.com.ar/">
+          <div class="form-actions">
+            <button class="minibutton"><span>Save</span></button> &nbsp; <a href="#" class="cancel">Cancel</a>
+          </div>
+        </form>
+      </div>
+
+      <div class="rule "></div>
+
+      <div id="url_box" class="url-box">
+        <ul class="clone-urls">
+          
+            
+            <li id="http_clone_url"><a href="http://github.com/peterpunk/open_flash_chart_lazy.git" data-permissions="Read-Only">HTTP</a></li>
+            <li id="public_clone_url"><a href="git://github.com/peterpunk/open_flash_chart_lazy.git" data-permissions="Read-Only">Git Read-Only</a></li>
+          
+        </ul>
+        <input type="text" spellcheck="false" id="url_field" class="url-field" />
+              <span style="display:none" id="url_box_clippy"></span>
+      <span id="clippy_tooltip_url_box_clippy" class="clippy-tooltip tooltipped" title="copy to clipboard">
+      <object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000"
+              width="14"
+              height="14"
+              class="clippy"
+              id="clippy" >
+      <param name="movie" value="http://assets3.github.com/flash/clippy.swf?v5"/>
+      <param name="allowScriptAccess" value="always" />
+      <param name="quality" value="high" />
+      <param name="scale" value="noscale" />
+      <param NAME="FlashVars" value="id=url_box_clippy&amp;copied=&amp;copyto=">
+      <param name="bgcolor" value="#FFFFFF">
+      <param name="wmode" value="opaque">
+      <embed src="http://assets3.github.com/flash/clippy.swf?v5"
+             width="14"
+             height="14"
+             name="clippy"
+             quality="high"
+             allowScriptAccess="always"
+             type="application/x-shockwave-flash"
+             pluginspage="http://www.macromedia.com/go/getflashplayer"
+             FlashVars="id=url_box_clippy&amp;copied=&amp;copyto="
+             bgcolor="#FFFFFF"
+             wmode="opaque"
+      />
+      </object>
+      </span>
+
+        <p id="url_description">This URL has <strong>Read+Write</strong> access</p>
+      </div>
+    </div>
+
+
+        
+
+      </div><!-- /.pagehead -->
+
+      
+
+
+
+
+
+
+
+
+
+
+
+<script type="text/javascript">
+  GitHub.currentCommitRef = "master"
+  GitHub.currentRepoOwner = "peterpunk"
+  GitHub.currentRepo = "open_flash_chart_lazy"
+  GitHub.downloadRepo = '/peterpunk/open_flash_chart_lazy/archives/master'
+
+  
+
+  
+</script>
+
+
+
+
+
+
+
+
+
+
+  <div id="commit">
+    <div class="group">
+        
+  <div class="envelope commit">
+    <div class="human">
+      
+        <div class="message"><pre><a href="/peterpunk/open_flash_chart_lazy/commit/e07f54b61bbcf8ab402bc3fd5088589ec9688e22">now uses Mhash the renamed version of Mash</a> </pre></div>
+      
+
+      <div class="actor">
+        <div class="gravatar">
+          
+          <img src="http://www.gravatar.com/avatar/48ae1944e6a82dffa18694663e72c931?s=30&d=http%3A%2F%2Fgithub.com%2Fimages%2Fgravatars%2Fgravatar-30.png" alt="" width="30" height="30"  />
+        </div>
+        <div class="name"><a href="/peterpunk">peterpunk</a> <span>(author)</span></div>
+        <div class="date">
+          <abbr class="relatize" title="2008-09-01 07:30:40">Mon Sep 01 07:30:40 -0700 2008</abbr>
+        </div>
+      </div>
+
+      
+
+    </div>
+    <div class="machine">
+      <span>c</span>ommit&nbsp;&nbsp;<a href="/peterpunk/open_flash_chart_lazy/commit/e07f54b61bbcf8ab402bc3fd5088589ec9688e22" hotkey="c">e07f54b61bbcf8ab402b</a><br />
+      <span>t</span>ree&nbsp;&nbsp;&nbsp;&nbsp;<a href="/peterpunk/open_flash_chart_lazy/tree/e07f54b61bbcf8ab402bc3fd5088589ec9688e22" hotkey="t">944293fc909330d77717</a><br />
+      
+        <span>p</span>arent&nbsp;
+        
+        <a href="/peterpunk/open_flash_chart_lazy/tree/55ee5d15170afd5330b149c7ee46b1d7f8c2a020" hotkey="p">55ee5d15170afd5330b1</a>
+      
+
+    </div>
+  </div>
+
+    </div>
+  </div>
+
+
+
+
+  
+    <div id="path">
+      <b><a href="/peterpunk/open_flash_chart_lazy/tree/master">open_flash_chart_lazy</a></b> / 
+    </div>
+
+    
+      
+
+  <script type="text/javascript">
+    GitHub.currentTreeSHA = "e07f54b61bbcf8ab402bc3fd5088589ec9688e22"
+    GitHub.commitSHA = "e07f54b61bbcf8ab402bc3fd5088589ec9688e22"
+    GitHub.currentPath = ""
+  </script>
+
+
+<div id="browser">
+  <table cellpadding="0" cellspacing="0">
+    <tr>
+      <th></th>
+      <th>name</th>
+      <th>age</th>
+      <th>
+        <div class="history">
+          <a href="/peterpunk/open_flash_chart_lazy/commits/master/">history</a>
+        </div>
+        message
+      </th>
+    </tr>
+
+    
+
+    
+            <tr class="alt">
+        <td class="icon"> <img alt="file" src="http://assets2.github.com/images/icons/txt.png?a1b8a88f7b518bd5df4805ae0d7ef179396115ed" /> </td>
+        <td class="content"> <a href="/peterpunk/open_flash_chart_lazy/blob/e07f54b61bbcf8ab402bc3fd5088589ec9688e22/History.txt" id="f77f08ef8785ba6d23be525fae5825104c6517b6">History.txt</a></td>
+        
+        <td class="age"> <span class="relatize">Mon Sep 01 07:30:40 -0700 2008</span> </td>
+        <td class="message"> <a href="/peterpunk/open_flash_chart_lazy/commit/e07f54b61bbcf8ab402bc3fd5088589ec9688e22" class="message" title="now uses Mhash the renamed version of Mash">now uses Mhash the renamed version of Mash</a> [<a href="/peterpunk">peterpunk</a>] </td>
+      </tr>
+    
+            <tr class="">
+        <td class="icon"> <img alt="file" src="http://assets2.github.com/images/icons/txt.png?a1b8a88f7b518bd5df4805ae0d7ef179396115ed" /> </td>
+        <td class="content"> <a href="/peterpunk/open_flash_chart_lazy/blob/e07f54b61bbcf8ab402bc3fd5088589ec9688e22/MIT-LICENSE" id="427bdb7340a7998f50bb20c973cc98ad1e1689f4">MIT-LICENSE</a></td>
+        
+        <td class="age"> <span class="relatize">Thu Jul 10 21:07:55 -0700 2008</span> </td>
+        <td class="message"> <a href="/peterpunk/open_flash_chart_lazy/commit/4053d682b5ce3be330402ffeb38b9487585ff8db" class="message" title="initial commit">initial commit</a> [<a href="/peterpunk">peterpunk</a>] </td>
+      </tr>
+    
+            <tr class="alt">
+        <td class="icon"> <img alt="file" src="http://assets2.github.com/images/icons/txt.png?a1b8a88f7b518bd5df4805ae0d7ef179396115ed" /> </td>
+        <td class="content"> <a href="/peterpunk/open_flash_chart_lazy/blob/e07f54b61bbcf8ab402bc3fd5088589ec9688e22/README.textile" id="736ed2f375df39e1d0c8b2384eb8ea290ca930ce">README.textile</a></td>
+        
+        <td class="age"> <span class="relatize">Mon Sep 01 07:30:40 -0700 2008</span> </td>
+        <td class="message"> <a href="/peterpunk/open_flash_chart_lazy/commit/e07f54b61bbcf8ab402bc3fd5088589ec9688e22" class="message" title="now uses Mhash the renamed version of Mash">now uses Mhash the renamed version of Mash</a> [<a href="/peterpunk">peterpunk</a>] </td>
+      </tr>
+    
+            <tr class="">
+        <td class="icon"> <img alt="file" src="http://assets2.github.com/images/icons/txt.png?a1b8a88f7b518bd5df4805ae0d7ef179396115ed" /> </td>
+        <td class="content"> <a href="/peterpunk/open_flash_chart_lazy/blob/e07f54b61bbcf8ab402bc3fd5088589ec9688e22/Rakefile" id="c68547b6835c6568ba92471392fd30a6e1b10502">Rakefile</a></td>
+        
+        <td class="age"> <span class="relatize">Sat Jul 26 21:03:57 -0700 2008</span> </td>
+        <td class="message"> <a href="/peterpunk/open_flash_chart_lazy/commit/4189988c73597ab3a9a3d45eb013195520dcfb30" class="message" title="gemspec">gemspec</a> [<a href="/peterpunk">peterpunk</a>] </td>
+      </tr>
+    
+            <tr class="alt">
+        <td class="icon"> <img alt="directory" src="http://assets1.github.com/images/icons/dir.png?a1b8a88f7b518bd5df4805ae0d7ef179396115ed" /> </td>
+        <td class="content"> <a href="/peterpunk/open_flash_chart_lazy/tree/e07f54b61bbcf8ab402bc3fd5088589ec9688e22/assets" id="9ff4afccb614b437e252619c78c077819e089965">assets/</a></td>
+        
+        <td class="age"> <span class="relatize">Sat Aug 30 11:06:12 -0700 2008</span> </td>
+        <td class="message"> <a href="/peterpunk/open_flash_chart_lazy/commit/8133572b9266c206613bc399d61165d04f9fcf4a" class="message" title="Mash required and more friendly parameter set">Mash required and more friendly parameter set</a> [<a href="/peterpunk">peterpunk</a>] </td>
+      </tr>
+    
+            <tr class="">
+        <td class="icon"> <img alt="file" src="http://assets2.github.com/images/icons/txt.png?a1b8a88f7b518bd5df4805ae0d7ef179396115ed" /> </td>
+        <td class="content"> <a href="/peterpunk/open_flash_chart_lazy/blob/e07f54b61bbcf8ab402bc3fd5088589ec9688e22/init.rb" id="603978bccb4b309166a2c129e9f39d5261c2412e">init.rb</a></td>
+        
+        <td class="age"> <span class="relatize">Thu Jul 10 21:07:55 -0700 2008</span> </td>
+        <td class="message"> <a href="/peterpunk/open_flash_chart_lazy/commit/4053d682b5ce3be330402ffeb38b9487585ff8db" class="message" title="initial commit">initial commit</a> [<a href="/peterpunk">peterpunk</a>] </td>
+      </tr>
+    
+            <tr class="alt">
+        <td class="icon"> <img alt="file" src="http://assets2.github.com/images/icons/txt.png?a1b8a88f7b518bd5df4805ae0d7ef179396115ed" /> </td>
+        <td class="content"> <a href="/peterpunk/open_flash_chart_lazy/blob/e07f54b61bbcf8ab402bc3fd5088589ec9688e22/install.rb" id="f7732d3796c262cc0556800bbac8900127a562fc">install.rb</a></td>
+        
+        <td class="age"> <span class="relatize">Thu Jul 10 21:07:55 -0700 2008</span> </td>
+        <td class="message"> <a href="/peterpunk/open_flash_chart_lazy/commit/4053d682b5ce3be330402ffeb38b9487585ff8db" class="message" title="initial commit">initial commit</a> [<a href="/peterpunk">peterpunk</a>] </td>
+      </tr>
+    
+            <tr class="">
+        <td class="icon"> <img alt="directory" src="http://assets1.github.com/images/icons/dir.png?a1b8a88f7b518bd5df4805ae0d7ef179396115ed" /> </td>
+        <td class="content"> <a href="/peterpunk/open_flash_chart_lazy/tree/e07f54b61bbcf8ab402bc3fd5088589ec9688e22/lib" id="1f7b7b89e9e4eda252771d4dbbbe7aa616cf20d7">lib/</a></td>
+        
+        <td class="age"> <span class="relatize">Mon Sep 01 07:30:40 -0700 2008</span> </td>
+        <td class="message"> <a href="/peterpunk/open_flash_chart_lazy/commit/e07f54b61bbcf8ab402bc3fd5088589ec9688e22" class="message" title="now uses Mhash the renamed version of Mash">now uses Mhash the renamed version of Mash</a> [<a href="/peterpunk">peterpunk</a>] </td>
+      </tr>
+    
+            <tr class="alt">
+        <td class="icon"> <img alt="directory" src="http://assets1.github.com/images/icons/dir.png?a1b8a88f7b518bd5df4805ae0d7ef179396115ed" /> </td>
+        <td class="content"> <a href="/peterpunk/open_flash_chart_lazy/tree/e07f54b61bbcf8ab402bc3fd5088589ec9688e22/specs" id="64becd95043a932cba26a847c5fe9e55cb4ff3e5">specs/</a></td>
+        
+        <td class="age"> <span class="relatize">Mon Sep 01 07:30:40 -0700 2008</span> </td>
+        <td class="message"> <a href="/peterpunk/open_flash_chart_lazy/commit/e07f54b61bbcf8ab402bc3fd5088589ec9688e22" class="message" title="now uses Mhash the renamed version of Mash">now uses Mhash the renamed version of Mash</a> [<a href="/peterpunk">peterpunk</a>] </td>
+      </tr>
+    
+            <tr class="">
+        <td class="icon"> <img alt="directory" src="http://assets1.github.com/images/icons/dir.png?a1b8a88f7b518bd5df4805ae0d7ef179396115ed" /> </td>
+        <td class="content"> <a href="/peterpunk/open_flash_chart_lazy/tree/e07f54b61bbcf8ab402bc3fd5088589ec9688e22/tasks" id="ab18ac3f67df7d05c044c721a0a36ad53d265806">tasks/</a></td>
+        
+        <td class="age"> <span class="relatize">Thu Jul 10 21:07:55 -0700 2008</span> </td>
+        <td class="message"> <a href="/peterpunk/open_flash_chart_lazy/commit/4053d682b5ce3be330402ffeb38b9487585ff8db" class="message" title="initial commit">initial commit</a> [<a href="/peterpunk">peterpunk</a>] </td>
+      </tr>
+    
+            <tr class="alt">
+        <td class="icon"> <img alt="directory" src="http://assets1.github.com/images/icons/dir.png?a1b8a88f7b518bd5df4805ae0d7ef179396115ed" /> </td>
+        <td class="content"> <a href="/peterpunk/open_flash_chart_lazy/tree/e07f54b61bbcf8ab402bc3fd5088589ec9688e22/test" id="a013301e7f559ad20b7600b2201f51a14d77e802">test/</a></td>
+        
+        <td class="age"> <span class="relatize">Thu Jul 10 21:07:55 -0700 2008</span> </td>
+        <td class="message"> <a href="/peterpunk/open_flash_chart_lazy/commit/4053d682b5ce3be330402ffeb38b9487585ff8db" class="message" title="initial commit">initial commit</a> [<a href="/peterpunk">peterpunk</a>] </td>
+      </tr>
+    
+            <tr class="">
+        <td class="icon"> <img alt="file" src="http://assets2.github.com/images/icons/txt.png?a1b8a88f7b518bd5df4805ae0d7ef179396115ed" /> </td>
+        <td class="content"> <a href="/peterpunk/open_flash_chart_lazy/blob/e07f54b61bbcf8ab402bc3fd5088589ec9688e22/uninstall.rb" id="97383334634d7e323699932440387d73052162d3">uninstall.rb</a></td>
+        
+        <td class="age"> <span class="relatize">Thu Jul 10 21:07:55 -0700 2008</span> </td>
+        <td class="message"> <a href="/peterpunk/open_flash_chart_lazy/commit/4053d682b5ce3be330402ffeb38b9487585ff8db" class="message" title="initial commit">initial commit</a> [<a href="/peterpunk">peterpunk</a>] </td>
+      </tr>
+    
+  </table>
+</div>
+    
+
+  
+
+
+  
+
+  <div id="readme" class="announce textile"><span class="name">README.textile</span><div class="wikistyle"><h1>OpenFlashChartLazy</h1>
+<p>This plugin allows to use the OpenFlashChart version 2 with Rails.<br />
+The idea is to get it as simple and extensible as possible, support future change of <a href="http://teethgrinder.co.uk/open-flash-chart-2/">open_flash_chart</a><br />
+To support this, I did not reproduce all the <span class="caps">OFC</span> attributes on the plugin, just only the basic. All the main attributes are hashes, so if <span class="caps">OFC</span> add a new attribute you can add too! and the code still the same!</p>
+<p>Initially will only support bar,line and pie graph, but is easy to add support for the other graphs<br />
+I built it to solve a problem, not all the problems that we can have in the world ;-)</p>
+<p>Inline suport is limiter to only one graph due to the swf callbacks not available yet, but soon we can support more than one.</p>
+<h2>Todo</h2>
+<ul>
+	<li>Universal Rails-Sinatra-Merb compatible</li>
+	<li>More doc</li>
+	<li>Support for other graphs</li>
+	<li>Label annotation for pies</li>
+	<li>May be more specs? mmm</li>
+	<li>Add series matcher block to allow any kind of matcher for series</li>
+	<li>Avoid to specify the start_date for time series for each serie</li>
+	<li>Add periodically_call_remote_graph (rodrigo orrego chileonrails)</li>
+</ul>
+<h2>Known issues</h2>
+<ul>
+	<li>Not support for 2 graphs inline yet.</li>
+	<li>Inline graph not compatible with prototype.js</li>
+</ul>
+<h2>Dependencies</h2>
+<p>Install this gems before.</p>
+<p>Mhash<br />
+<pre><code>
+  gem sources -a http://gems.github.com
+  sudo gem install peterpunk-mhash
+&lt;/pre&gt;</code></p>
+<h2>Install</h2>
+<h3>Rails</h3>
+<pre><code>
+cd vendor/plugins
+git clone git://github.com/peterpunk/open_flash_chart_lazy.git
+cd ..
+cd ..
+rake open_flash_chart_lazy:install
+</pre><p></code></p>
+<h3>Sinatra</h3>
+<pre><code>
+cd vendor
+git clone git://github.com/peterpunk/open_flash_chart_lazy.git
+cd ..
+rake open_flash_chart_lazy:install (no tested)
+</pre><p></code></p>
+<h2>Uninstall</h2>
+<pre><code>
+rake open_flash_chart_lazy:remove
+</pre><p></code></p>
+<h2>Examples for Rails</h2>
+<h3>With remote data</h3>
+<h4>In the controller</h4>
+<pre><code>
+def progress
+  bar_graph = OpenFlashChartLazy::Line.new("The title of the graph")
+  first_serie = OpenFlashChartLazy::Serie.new(
+  [["2008-1",100],["2008-2",120],["2008-3",130]],
+  {:title=&gt;"Argentina",:start_date=&gt;Time.mktime(2008,1,1),:items=&gt;8})
+  
+  second_serie = OpenFlashChartLazy::Serie.new(
+  [["2008-1",50],["2008-2",40],["2008-3",90]],
+  {:title=&gt;"Tupungato",:start_date=&gt;Time.mktime(2008,1,1),:items=&gt;8})
+
+  bar_graph.add_serie(first_serie)
+  bar_graph.add_serie(second_serie)
+  
+  render :text=&gt;bar_graph.to_graph_json
+end
+
+</pre><p></code></p>
+<h4>In the view</h4>
+<pre><code>
+&lt;%= remote_graph("my_chart",{:route=&gt;"/admin/dashboard/progress"}) %&gt;
+</pre><p></code></p>
+<h3>With inline data</h3>
+<h4>In the controller</h4>
+<pre><code>
+def show
+  @pie_chart = OpenFlashChartLazy::Pie.new("Channels")
+  channels=OpenFlashChartLazy::Serie.new([["Wealth",34],["Financial",45]])
+  @pie_chart.add_serie(channels)
+end
+</code></pre>
+<h4>In the view</h4>
+<pre><code>
+&lt;%= inline_graph(@pie_chart) %&gt;
+</pre><p></code></p>
+<h4>Customize the Chart</h4>
+<p>All graph attributes are hash in general so you can add what you need and if the open_flash_chart add new parameters, just add them.</p>
+
+<pre><code>
+bar_graph.x_axis[:labels][:rotate]="vertical"
+bar_graph.x_axis[:labels][:rotate]="vertical"
+bar_graph.x_axis[:colour]="#808080"
+bar_graph.x_axis["grid-colour"]="#A0A0A0"
+bar_graph.x_axis[:stroke]=1
+
+bar_graph.y_axis[:colour]="#808080"
+bar_graph.y_axis[:stroke]=1
+bar_graph.y_axis["grid-colour"]="#A0A0A0"
+</pre><p></code></p>
+<h4>Background attributes</h4>
+<p>You can specify all of them, this is handle by method missing so just use like this.</p>
+<pre><code>
+bar_graph.bg_colour="#FFFFFF"
+</pre><p></code></p>
+<h3>Other implementations for version 2</h3>
+<p><a href="http://github.com/korin/open_flash_chart_2/tree/master">http://github.com/korin/open_flash_chart_2/tree/master</a> <br />
+<a href="http://pullmonkey.com/2008/7/25/using-a-database-to-populate-an-open-flash-chart-graph">The &#8216;Official&#8217; implementation</a></p>
+<h3>Implementations for version 1</h3>
+<p><a href="http://github.com/markcatley/open_flash_chart/tree/master">http://github.com/markcatley/open_flash_chart/tree/master</a></p>
+<p>Enjoy!</p>
+<p>Copyright &#169; 2008 Pedro Visintin, released under the <span class="caps">MIT</span> license</p></div></div>
+
+
+
+    </div>
+  
+      
+
+      <div class="push"></div>
+    </div>
+
+    <div id="footer">
+      <div class="site">
+        <div class="info">
+          <div class="links">
+            <a href="http://github.com/blog"><b>Blog</b></a> |
+            <a href="http://support.github.com">Support</a> |
+            <a href="http://github.com/training">Training</a> |
+            <a href="http://github.com/contact">Contact</a> |
+            <a href="http://develop.github.com">API</a> |
+            <a href="http://status.github.com">Status</a> |
+            <a href="http://twitter.com/github">Twitter</a> |
+            <a href="http://help.github.com">Help</a> |
+            <a href="http://github.com/security">Security</a>
+          </div>
+          <div class="company">
+            &copy;
+            2010
+            <span id="_rrt" title="0.11430s from fe1.rs.github.com">GitHub</span> Inc.
+            All rights reserved. |
+            <a href="/site/terms">Terms of Service</a> |
+            <a href="/site/privacy">Privacy Policy</a>
+          </div>
+        </div>
+        <div class="sponsor">
+          <div>
+            Powered by the <a href="http://www.rackspace.com ">Dedicated
+            Servers</a> and<br/> <a href="http://www.rackspacecloud.com">Cloud
+            Computing</a> of Rackspace Hosting<span>&reg;</span>
+          </div>
+          <a href="http://www.rackspace.com">
+            <img alt="Dedicated Server" src="http://assets0.github.com/images/modules/footer/rackspace_logo.png?8b7d51c78c92a7e4c4734ae9042a021682b5af00" />
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <script>window._auth_token = "24754495d3ee87daabd4850d62d366dccc8650ba"</script>
+    
+
+    <script type="text/javascript">
+      _kmq.push(['trackClick', 'entice_banner_link', 'Entice banner clicked']);
+      
+    </script>
+    
+  </body>
+</html>
+
