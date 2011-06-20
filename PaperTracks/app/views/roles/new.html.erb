@@ -1,0 +1,20 @@
+<h1>New Role</h1>
+
+<% form_for(@role) do |f| %>
+  <%= f.error_messages %>
+
+  <p>
+    Role Name:<br />
+    <%= f.text_field :rolename %>
+  </p>
+    <% #select(:extra,:typeid, @roletypes.map {|r| [r.typename, r.id]})
+  %>
+    Which Group is this Role for?<br>
+    <%= select(:extra,:groupid, @groups.map {|r| [r.groupname, r.id]})%>
+  <%= hidden_field(:extra, :redirectgroup, :value => @group_id) %>
+  <p>
+    <%= f.submit 'Create' %>
+  </p>
+<% end %>
+<div style="width: 60px; text-align: right">
+<%= link_to icon_link("back.png","Back"), roles_path %></div>

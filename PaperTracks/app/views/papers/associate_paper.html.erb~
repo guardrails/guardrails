@@ -1,0 +1,2 @@
+<%= @anotherArray[Integer(params[:index])] %>
+<%= @myhtml[Integer(params[:index])]%>

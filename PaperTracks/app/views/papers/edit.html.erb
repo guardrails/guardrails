@@ -1,0 +1,11 @@
+        <div class="special_table">
+                 <br>
+        Is this information about your paper correct?
+        <% form_for(@paper) do |f| %>
+                    <p><label for="title">Title</label><br/>
+                    <%= f.text_field :title %></p>
+                    <p><label for="author">Author</label><br/>
+                    <%= f.text_field :author %></p>
+                    <p><%= f.submit 'Finish Adding Paper' %></p>
+        <% end %>
+                </div>

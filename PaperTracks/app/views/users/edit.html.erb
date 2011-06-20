@@ -1,0 +1,7 @@
+<h3>Edit profile for <%= @user.profile_link %></h3>
+Use HTML to create your user profile:
+ <% form_for(@user) do |f| %>
+  <%= f.error_messages %>
+  <%= f.text_area :profile %><br><br>
+  <%= f.submit 'Update' %>
+<% end %>

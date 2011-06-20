@@ -1,0 +1,40 @@
+<h1>Groups</h1>
+<%= table_w_sortheader(["Group Name"],"/groups",[["alpha","Alphabetically A->Z "],["alpha2","Alphabetically Z->A "],["apprv","By Approval Status"]]) %>
+<% @groups.each do |group| %>
+  <%= tr %>
+   <td><%= group.profile_link %>
+   <% if !group.admin %>
+    <td style="text-align: center; width:85px">
+    <% if group.approved %>
+      <% if current_user.groups.find_by_groupname(group.groupname) %>
+         <%= link_to icon_link("delete.png","Leave"), :action => 'join', :id => group %>
+      <% else %>
+         <%= link_to icon_link("add.png","Join"), :action => 'join', :id => group %>
+      <% end %>
+    <% end %>
+    </td>
+    <td style="text-align: center; width: 70px">
+      <%= link_to icon_link("edit.png","Edit"), edit_group_path(group) %>
+    </td>
+    <td style="text-align: center; width: 90px">
+      <%= link_to icon_link("remove.png","Remove"),
+ group, :confirm => 'Are you sure?', :method => :delete %>
+    </td>
+    <td style="text-align: center; width: 90px">
+      <% if group.approved %>
+        <%= link_to icon_link("cancel.png","Suspend"), :action => :suspend, :id => group, :sort => params[:sort] %>
+      <% else %>
+        <%= link_to icon_link("check.png","Approve"), :action => :approve, :id => group, :sort => params[:sort] %>
+      <% end %>
+   </td>
+<% else %>
+<td colspan=4></td>
+<% end %>
+  </tr>
+<% end %>
+</table>
+
+<br />
+<div style="width: 102px; text-align: right;">
+<%= link_to icon_link("new.png","New Group"), new_group_path + "/0" %>
+</div>

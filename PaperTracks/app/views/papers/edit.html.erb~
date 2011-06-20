@@ -1,0 +1,10 @@
+	<% form_for(@paper) do |f| %>
+		    <p><label for="title">Title</label><br/>
+		    <%= f.text_field :title %></p>
+		    <p><label for="author">Author</label><br/>
+		    <%= f.text_field :author %></p>
+		    <p><label for="citations">Citations</label><br/>
+		    <%= f.text_field :last_citations %></p>
+		    <p><%= f.submit 'Update Paper' %></p>
+	<% end %>
+		

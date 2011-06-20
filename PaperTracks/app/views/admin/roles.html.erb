@@ -1,0 +1,32 @@
+<table style="width: 350px;">
+<tr class="tableheader">
+  <th style=" padding-top: 3px; padding-bottom: 3px;" colspan=2>
+        <%= @user.login %> currently has roles:</th></tr>
+  <% @user_roles.each do |role| %>
+   <%= tr %><td style="padding: 5px"><%= role.rolename %></td>
+        <td style="text-align:right; width: 85px">
+        <a href="/admin/roleremove/
+<%= @group_id + "/" + @user.id.inspect + "/" + role.id.inspect %>">
+<%= icon_link("delete.png","Remove") %></a></tr>
+  <% end %>
+</table>
+
+<br>
+<table style="width: 350px;">
+    <tr class="tableheader">
+        <style="padding-top: 3px; padding-bottom: 3px;">
+        <th>All Roles:</th><th></th></tr>
+    <% @roles.each do |role| %>
+       <% if !@user.roles.exists?(role) %>
+     <%= tr %>
+       <td style="padding: 5px">
+        <%= role.rolename %></td>
+       <td style="text-align:right; width:55px;">
+        <%= link_to image_tag("add.png", :size => "16x16", :class => 'icon') + '&nbsp;Add', :action => :roleadd,
+          :id3 => role.id.inspect, :id2 => @user.id.inspect, :id => @group_id %></td>
+     </tr>
+       <% end %>
+    <% end %>
+</table>
+<br><br>&nbsp;
+<%= link_to icon_link("back.png","Back"), :action => :users, :id => @group_id %>

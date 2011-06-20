@@ -1,0 +1,18 @@
+<h1>Role Permissions</h1>
+
+<%= table_w_header(["Permission Name"]) %>
+ <% @permissions.each do |permission| %>
+  <%= tr %>
+    <td><%=h permission.permissionname %></td>
+    <td style="text-align: center; width: 80px;">
+      <%= link_to icon_link("edit.png","Edit"), edit_permission_path(permission) %>
+    </td>
+    <td style="text-align: right; width: 80px">
+      <%= link_to icon_link("delete.png","Delete"), permission, :confirm => 'Are you sure?', :method => :delete %>
+    </td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+<div style="width: 145px; text-align: right;"><%= link_to icon_link("new.png","New Permission"), new_permission_path %></div>

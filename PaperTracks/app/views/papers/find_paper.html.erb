@@ -1,0 +1,17 @@
+<% require 'mechanize'%>
+<% @counter = 0 %>
+<%= table_w_header(["Results for '" + @mypaper + "'"]) %>
+<% @finalarray.each do |posting| %>
+<%= tr %>
+    <td style="padding-left: 20px;" colspan=2>
+        <%= posting.to_s.gsub(/<span class="gs_ctg">.*?<\/span>/,"").gsub(/<span class="gs_ggs gs_fl">.*?<\/span>/,"").gsub(/\[.*\]/,"") %><br>
+        <%= link_to "Add This Paper", { :controller => 'papers', :action => 'associate_paper', :index => @counter, :pname => @mypaper}, :class => 'associate' %><br><br>
+        <% @counter += 1 %>
+    </td>
+</tr>
+<%end%>
+<tr><td></td><td style="text-align:center; font-size: 12px;">Powered by:</td></tr>
+<tr><td></td><td style="text-align:right; width: 190px;"><%= image_tag("gs_logo.gif") %></td></tr>
+</table>
+
+

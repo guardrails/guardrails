@@ -1,0 +1,2 @@
+module RoleTypesHelper
+end

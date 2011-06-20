@@ -1,0 +1,16 @@
+<h1>New role_type</h1>
+
+<% form_for(@role_type) do |f| %>
+  <%= f.error_messages %>
+
+  <p>
+    <%= f.label :typename %><br />
+    <%= f.text_field :typename %>
+  </p>
+  <p>
+    <%= f.submit 'Create' %>
+  </p>
+<% end %>
+
+<%= image_tag "back.png", :size => "16x16", :class => "icon" %>&nbsp;
+<%= link_to 'Back', role_types_path %>

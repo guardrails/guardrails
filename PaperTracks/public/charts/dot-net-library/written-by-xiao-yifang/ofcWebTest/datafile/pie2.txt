@@ -1,0 +1,101 @@
+{
+	"title": 
+		{
+			"text": "Pie Chart",
+			"style": "{font-size: 20px; color:#0000ff; font-family: Verdana; text-align: center;}"
+		},
+	"x_axis": 
+		{
+			"labels": 
+				{},
+			"steps": 1,
+			"3d": 0,
+			"offset": false
+		},
+	"y_axis": 
+		{
+			"tick-length": 0,
+			"labels": 
+				{},
+			"3d": 0,
+			"offset": false
+		},
+	"elements": 
+		[
+			{
+				"colours": 
+					[
+						"#04f",
+						"#1ff",
+						"#6ef",
+						"#f30"
+					],
+				"border": 2,
+				"alpha": 0.5,
+				"animate":true,
+				"start-angle": 0,
+				"tip": "#label#,#val# of #total##percent# of 100%",
+				"values": 
+					[
+						{
+							"value": 0.87509237689668884,
+							"label": "Pie0"
+						},
+						{
+							"value": 0.77562727396172815,
+							"label": "Pie1"
+						},
+						{
+							"value": 0.7019000913491007,
+							"label": "Pie2"
+						},
+						{
+							"value": 0.031812614776106835,
+							"label": "Pie3"
+						},
+						{
+							"value": 0.12220542464507997,
+							"label": "Pie4"
+						},
+						{
+							"value": 0.56079936565868527,
+							"label": "Pie5"
+						},
+						{
+							"value": 0.29222183082821862,
+							"label": "Pie6"
+						},
+						{
+							"value": 0.46080731528848751,
+							"label": "Pie7"
+						},
+						{
+							"value": 0.39761153394245147,
+							"label": "Pie8"
+						},
+						{
+							"value": 0.29556374777833172,
+							"label": "Pie9"
+						},
+						{
+							"value": 0.43673098852705722,
+							"label": "Pie10"
+						},
+						{
+							"value": 0.90168537660580383,
+							"label": "Pie11"
+						},
+						{
+							"value": 10,
+							"on-click": "http://xiao-yifang.blogspot.com"
+						}
+					],
+				"font-size": 20,
+				"fillalpha": 0.35,
+				"type": "pie",
+				"dot-style": 
+					{}
+			}
+		],
+	"bg_colour": "#202020"
+}

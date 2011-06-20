@@ -1,0 +1,29 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+       "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+  <title>PaperTracks</title>
+</head>
+<body>
+  <%= stylesheet_link_tag 'core' %>
+<table style="width: 100%" cellspacing=0 cellpadding=0>
+<tr><td colspan="10"><center><h1>PaperTracks</h1></center></td></tr>
+<%= @user = current_user
+  if (@user)
+     "<tr style='background-color:#000000; height:30px;'><td style='width:150px;'><center><a href='#' style='color:#ffffff'><b>My Papers</b></a></center></td><td style='width:150px;'><center><b><a href='/groups/mygroups/' style='color:#ffffff;'>My Groups</a></b></center></td><td></td></tr>"
+    else
+      "<tr style='background-color:#000000; height:30px;'><td colspan='10'></td></tr>"
+    end %>
+<tr><td colspan="10" style="text-align:right; padding-top: 5px;"> <%= if (@user)
+                                       "Logged in as: " + @user.login + " (<a href='/logout'>Logout</a>)"
+                                     else
+                                       "You are not logged in  (<a href='/login'>Login</a> or <a href='/signup'>Register</a>)"
+                                     end %></td></tr>
+</table>
+<p style="color: green"><%= flash[:notice] %></p>
+<%= yield %>
+
+</body>
+</html>

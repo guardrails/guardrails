@@ -1,0 +1,125 @@
+{
+	"title": 
+		{
+			"text": "line\u6F14\u793A",
+			"style": "{font-size: 20px; color:#0000ff; font-family: Verdana; text-align: center;}"
+		},
+	"x_axis": 
+		{
+			"labels": 
+				{
+					"colour": "#e43456"
+				},
+			"steps": 4,
+			"3d": 0,
+			"offset": false
+		},
+	"y_axis": 
+		{
+			"tick-length": 0,
+			"labels": 
+				{
+					"colour": "#ef6745"
+				},
+			"colour": "#ef6745",
+			"steps": 3,
+			"min": 0,
+			"max": 35,
+			"3d": 0,
+			"offset": 1
+		},
+	"y_axis_right": 
+		{
+			"tick-length": 4,
+			"labels": 
+				{},
+			"steps": 8,
+			"min": 0,
+			"max": 60,
+			"3d": 0,
+			"offset": false
+		},
+	"elements": 
+		[
+			{
+				"width": 2,
+				"dot-size": 5,
+				"halo-size": 0,
+				"loop": false,
+				"tip": "\u63D0\u793A\uFF1A#val#",
+				"values": 
+					[
+						9,
+						25,
+						16,
+						14,
+						24,
+						25,
+						12,
+						25,
+						2,
+						15,
+						1,
+						11
+					],
+				"fillalpha": 0.35,
+				"type": "line",
+				"dot-style": 
+					{
+						"type": "solid-dot",
+						"tip": "#x_label#\u003Cbr>#val#",
+						"colour": "#467533"
+					}
+			},
+			{
+				"width": 3,
+				"dot-size": 4,
+				"halo-size": 1,
+				"loop": false,
+				"axis": "right",
+				"tip": "\u63D0\u793A\uFF1A#val#",
+				"values": 
+					[
+						30,
+						40,
+						39,
+						15,
+						42,
+						25,
+						15,
+						0,
+						16,
+						39,
+						41,
+						47
+					],
+				"fillalpha": 0.35,
+				"type": "line",
+				"dot-style": 
+					{
+						"type": "solid-dot",
+						"tip": "#x_label#\u003Cbr>#val#",
+						"colour": "#fe4567"
+					}
+			}
+		],
+	"y_legend": 
+		{
+			"text": "\u4E2D\u6587test",
+			"style": "{font-size: 20px; color:#0000ff; font-family: Verdana; text-align: center;}"
+		},
+	"y2_legend": 
+		{
+			"text": "test y legend right",
+			"style": "{font-size: 20px; color:#0000ff; font-family: Verdana; text-align: center;}"
+		},
+	"tooltip": 
+		{
+			"text": "\u5168\u5C40\u63D0\u793A\uFF1A#val#",
+			"shadow": true,
+			"rounded": 1,
+			"stroke": 2,
+			"colour": "#e43456",
+			"mouse": 0
+		}
+}

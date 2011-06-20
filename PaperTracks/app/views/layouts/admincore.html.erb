@@ -1,0 +1,57 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+       "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+  <title>PaperTracks</title>
+</head>
+<body>
+  <%= stylesheet_link_tag 'core' %>
+<table cellspacing=0 cellpadding=0>
+<tr><td colspan="10"><center><!--<h1>PaperTracks: Administration</h1>-->
+<%= image_tag "PaperTracks.jpg" %><br>
+</center></td></tr>
+
+<% @user = current_user
+if !@group_id
+  @group_id = "0"
+end %>
+ <% if (@user) %>
+     <tr style='background-color:#000000; height:30px;'>
+  <td style='width:150px;'><center><a href='/' style='color:#ffffff'><b>Home</b></a></center></td>
+  <td style='width:150px;'><center><b><a href='/admin/users/<%= @group_id %> ' style='color:#ffffff;'>Users</a></b></center></td>
+  <td style='width:150px;'><center><b><a href='/roles/<%= @group_id %>' style='color:#ffffff;'>Roles</a></b></center></td>
+  <% if @group_id == "0" %>
+  <td style='width:150px;'><center><b><a href='/permissions/' style='color:#ffffff;'>Permissions</a></b></center></td>
+  <td style='width:150px;'><center><b><a href='/groups/' style='color:#ffffff;'>Groups</a></b></center></td>
+  <% else %>
+  <% if current_user.authen_check(Group.find(@group_id).groupname, "Delete Group") %>
+         <td style='width:150px;'><center><b>
+         <a href='/groups/destroy/<%= @group_id %>' style='color:#ffffff;'>
+         Delete Group</a></b></center></td>
+  <% end %>
+  <% end %>
+<td></td></tr>
+    <% else %>
+      <tr style='background-color:#000000; height:30px;'><td colspan='10'></td></tr>
+   <% end %>
+<tr><td colspan=10 style="background-color:#ffffff">
+<center>
+<div style="text-align: left; width: 800px; background-color:#ffffff;padding-top:0px;padding-left:20px;padding-right:20px; border-collapse: collapse;">
+<table>
+<tr><td colspan="10" style="text-align:right; padding-top: 5px;"> <%= if (@user)
+                                       "Logged in as: " + @user.profile_link + " (<a href='/logout'>Logout</a>)"
+                                     else
+                                       "You are not logged in  (<a href='/login'>Login</a> or <a href='/signup'>Register</a>)"
+                                     end %></td></tr>
+</table>
+<p style="color: green"><%= flash[:notice] %></p>
+<%= yield %>
+</div>
+</center>
+</td>
+</tr>
+</table>
+</body>
+</html>

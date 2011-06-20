@@ -1,0 +1,51 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+       "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+  <title>PaperTracks</title>
+<script type="text/javascript" src="/javascripts/swfobject.js"></script>
+
+</head>
+<body>
+  <%= stylesheet_link_tag 'core' %>
+<table>
+<tr><td colspan="10"><center>
+  <!--<h1>PaperTracks</h1> -->
+<%= image_tag "PaperTracks.jpg" %>
+</center></td></tr>
+<% @user = current_user
+   if (@user) %>
+     <tr style='height:30px;' class="tableheader">
+       <td style='width:150px;'><center><a href='/' style='color:#ffffff'><b>Home</b></a></center></td>
+       <td style='width:150px;'><center><a href='/papers' class="toolbarlink"><b>Find a Paper</b></a></center></td>
+       <td style='width:150px;'><center><a href='/mypapers' class="toolbarlink"><b>My Papers</b></a></center></td>
+       <td style='width:150px;'><center><b><a href='/groups/mygroups/' class="toolbarlink">My Groups</a></b></center></td>
+     <% if (@user.authen_check("Administration", "Modify User Roles")) %>
+       <td style='width:150px;'><center><b><a href="/admin/users" class="toolbarlink">Admin</a></b></center></td>
+       <% end %>
+       <td></td></tr>
+    <% else %>
+      <tr style='background-color:#000000; height:30px;'><td colspan='10'></td></tr>
+   <% end %>
+<tr><td colspan=10 style="background-color:#ffffff;">
+<center>
+<div style="text-align: left; width: 800px; background-color:#ffffff; ">
+<table>
+<tr><td colspan="10" style="text-align:right; padding-top: 5px;"> <%= if (@user)
+                                       "Logged in as: " + @user.profile_link + " (<a href='/logout'>Logout</a>)"
+                                     else
+                                       "You are not logged in  (<a href='/login'>Log In</a> or <a href='/signup'>Register</a>)"
+                                     end %></td></tr>
+</table>
+<p style="color: green"><%= flash[:notice] %></p>
+
+<%= yield %>
+</div>
+</center>
+</td>
+</tr>
+</table>
+</body>
+</html>

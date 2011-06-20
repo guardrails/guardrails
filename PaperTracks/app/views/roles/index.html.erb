@@ -1,0 +1,31 @@
+<h2>User Roles</h2>
+
+<%= table_w_header(["c_Role Name", "c_Role Type", "c_Group"]) %>
+<% @roles.each do |role| %>
+  <%= tr %>
+    <td><%=h role.rolename %></td>
+    <td><center><%= if role.role_type
+              role.role_type.typename
+              else
+              "-----"
+              end %></center></td>
+    <td><center><%= if role.group
+              role.group.profile_link
+              end %></center></td>
+    <td style="text-align: center">
+      <a href="/roles/edit/<%= @group_id %>/<%= role.id %>"><%= icon_link("edit.png","Edit Permissions") %></a>
+    </td>
+    <td style="text-align: center">
+      <%= link_to icon_link("delete.png","Delete"), role, :confirm => 'Are you sure?', :method => :delete %>
+    </td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+<% if !@group_id
+  @group_id = "0"
+end %>
+<div style="width: 100px; text-align: right;">
+<%= link_to icon_link("new.png","New Role"), new_role_path + "/" + @group_id %>
+</div>

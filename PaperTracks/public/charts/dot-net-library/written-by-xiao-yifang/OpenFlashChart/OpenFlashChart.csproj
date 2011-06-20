@@ -1,0 +1,115 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.50727</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{213ABC3E-F51E-4A09-A053-BC17E4797BA8}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>OpenFlashChart</RootNamespace>
+    <AssemblyName>OpenFlashChart</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Design" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Animation.cs" />
+    <Compile Include="AnimationType.cs" />
+    <Compile Include="Area.cs" />
+    <Compile Include="AreaBase.cs" />
+    <Compile Include="AreaHollow.cs" />
+    <Compile Include="AreaLine.cs" />
+    <Compile Include="Axis.cs" />
+    <Compile Include="Bar.cs" />
+    <Compile Include="Bar3D.cs" />
+    <Compile Include="BarBase.cs" />
+    <Compile Include="BarFilled.cs" />
+    <Compile Include="BarGlass.cs" />
+    <Compile Include="BarSketch.cs" />
+    <Compile Include="BarStack.cs" />
+    <Compile Include="BarType.cs" />
+    <Compile Include="Candle.cs" />
+    <Compile Include="Chart.cs" />
+    <Compile Include="AxisLabel.cs" />
+    <Compile Include="ChartBase.cs" />
+    <Compile Include="ChartControlDesigner.cs" />
+    <Compile Include="ChartElement.cs" />
+    <Compile Include="DotStyle.cs" />
+    <Compile Include="DotType.cs" />
+    <Compile Include="HBar.cs" />
+    <Compile Include="JSON\IJsonSerializable.cs" />
+    <Compile Include="JSON\JsonIgnoreAttribute.cs" />
+    <Compile Include="JSON\JsonNameAttribute.cs" />
+    <Compile Include="JSON\JsonPropertyAttribute.cs" />
+    <Compile Include="JSON\JsonReader.cs" />
+    <Compile Include="JSON\JsonSerializationException.cs" />
+    <Compile Include="JSON\JsonSpecifiedPropertyAttribute.cs" />
+    <Compile Include="JSON\JsonToken.cs" />
+    <Compile Include="JSON\JsonWriter.cs" />
+    <Compile Include="Legend.cs" />
+    <Compile Include="Line.cs" />
+    <Compile Include="LineBase.cs" />
+    <Compile Include="LineDot.cs" />
+    <Compile Include="LineDotValue.cs" />
+    <Compile Include="LineHollow.cs" />
+    <Compile Include="LineScatter.cs" />
+    <Compile Include="OpenFlashChart.cs" />
+    <Compile Include="OpenFlashChartControl.cs" />
+    <Compile Include="Pie.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RadarAxis.cs" />
+    <Compile Include="Scatter.cs" />
+    <Compile Include="Title.cs" />
+    <Compile Include="ToolTip.cs" />
+    <Compile Include="WebHandler\ofcHandler.cs" />
+    <Compile Include="XAxis.cs" />
+    <Compile Include="AxisLabels.cs" />
+    <Compile Include="XAxisLabels.cs" />
+    <Compile Include="YAxis.cs" />
+    <Compile Include="YAxisLabel.cs" />
+    <Compile Include="YAxisLabels.cs" />
+    <Compile Include="YAxisRight.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram1.cd" />
+    <None Include="ClassDiagram2.cd" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="JSON\License.txt" />
+    <Content Include="JSON\Readme too.txt" />
+    <Content Include="JSON\ReadMe.txt" />
+    <EmbeddedResource Include="open-flash-chart.swf" />
+    <Content Include="readme.txt" />
+    <EmbeddedResource Include="swfobject.js" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
