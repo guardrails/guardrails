@@ -78,17 +78,20 @@ class Sexp
     in_args = (self[0] == :arglist)
     in_class = (self[0] == :class)
 
+    ans=false
     self.each_index {|i|
       if self[i] == match and okay and not in_class
         self[i] = repl
+        ans=true
       elsif in_func
-        self[i].replace2!(match, repl, true) if self[i].is_a? Sexp
+        ans|=self[i].replace2!(match, repl, true) if self[i].is_a? Sexp
       elsif in_args
-        self[i].replace2!(match, repl, false) if self[i].is_a? Sexp
+        ans|=self[i].replace2!(match, repl, false) if self[i].is_a? Sexp
       else
-        self[i].replace2!(match, repl, okay) if self[i].is_a? Sexp
+        ans|=self[i].replace2!(match, repl, okay) if self[i].is_a? Sexp
       end
     }
+    ans
   end
 
   #######################################

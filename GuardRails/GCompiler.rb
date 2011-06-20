@@ -9,6 +9,7 @@ class GCompiler
   def initialize
     @parser 		= RubyParser.new
     @ruby2ruby 	= Ruby2Ruby.new
+    @gparser    = GParser.new
 
     @file_dirs		 	= {}
 
@@ -27,13 +28,13 @@ class GCompiler
     return subpath
   end
 
-  def process(dir)
+  def process(dir, *args)
     build_asts(dir)
 
     # Get all the annotations from model files
     ann_lists = {}
     for filename in @asts[:model].keys do
-      ann_lists[filename] = GParser.new.get_annotations("#{dir}/#{get_path(filename)}")
+      ann_lists[filename] = @gparser.get_annotations("#{dir}/#{get_path(filename)}")
     end
     puts "*************Annotations Discovered:*************"
     ann_lists.each_pair do |key, val|
@@ -47,11 +48,10 @@ class GCompiler
     model_names = []
     model_files = []
     get_models(model_names, model_files)
-    
-    
+
     config(dir)
     # Handle transformations
-    GTransformer.new.transform(@asts, ann_lists, model_names, model_files, @pass_user)
+    GTransformer.new.transform(@asts, ann_lists, model_names, model_files, @pass_user, $*[1..-1])
     # Rebuild the source code
     build_src(dir)
   end
@@ -61,8 +61,8 @@ class GCompiler
     # Build all models
     Find.find("#{dir}/app/models") do |path|
       next unless legal_file(path)
-
       filename = File.basename(path)
+      puts path
       @asts[:model][filename] = @parser.parse(File.read path)
       @file_dirs[filename] = path
     end
@@ -72,6 +72,7 @@ class GCompiler
       next unless legal_file(path)
 
       filename = File.basename(path)
+      puts path
       @asts[:controller][filename] = @parser.parse(File.read path)
       @file_dirs[filename] = path
     end
@@ -79,15 +80,49 @@ class GCompiler
     # Build all libraries
     Find.find("#{dir}/lib") do |path|
       next unless legal_file(path)
-      
+
       filename = File.basename(path)
-      @asts[:library][filename] = @parser.parse(File.read path)
+      puts path
+      begin
+        @asts[:library][filename] = @parser.parse(File.read path)
+      rescue Exception
+        puts "Path #{path} did not translate"
+        @parser=RubyParser.new
+      end
       @file_dirs[filename] = path
     end
 
+    # Build all views
+    Find.find("#{dir}/app/views") do |path|
+      next unless legal_file(path)
+
+      filename = File.basename(path)
+      puts path
+      begin
+        @asts[:view][filename] = RubyParser.new.parse(@gparser.convert_to_ruby(File.read path))
+      rescue
+        puts @gparser.convert_to_ruby(File.read path)
+        puts $!.message
+        @parser=RubyParser.new
+        puts $!.backtrace
+        #exit
+      end
+      @file_dirs[filename] = path
+    end
+    puts "done with views"
+
     # Some single files are needed as well
-    @asts[:migration] = @parser.parse(File.read "#{dir}/db/schema.rb")
-    @asts[:helper] 	= @parser.parse(File.read "#{dir}/app/helpers/application_helper.rb")
+    begin
+      @asts[:migration] = @parser.parse(File.read "#{dir}/db/schema.rb")
+    rescue
+      puts "No schema file"
+      #@asts[:migration]=@parser.parse("ActiveRecord::Schema.define(:version => 20100531202218) do\n\nend")
+    end
+    begin
+      @asts[:helper] 	= @parser.parse(File.read "#{dir}/app/helpers/application_helper.rb")
+    rescue
+      puts "No application helper file"
+    end
   end
 
   # Get a list of all the models that have ActiveRecord::Base as a parent
@@ -137,25 +172,33 @@ class GCompiler
     # Controllers
     for filename in @asts[:controller].keys
       path = get_path(filename)
-      File.new("#{dir}/#{path}", 'w').puts(@ruby2ruby.process(@asts[:controller][filename]))
+      begin
+        File.new("#{dir}/#{path}", 'w').puts(@ruby2ruby.process(@asts[:controller][filename]))
+      rescue
+      end
     end
 
     # Views
-    Find.find("#{dir}/app/views") do |path|
-      next unless legal_file(path)
-      txt = File.read path
-      File.new(path, 'w').puts "<% protect do %> #{txt} <% end %>"
+    for filename in @asts[:view].keys
+      path = get_path(filename)
+      begin
+        File.new("#{dir}/#{path}", 'w').puts(@gparser.convert_to_erb(@asts[:view][filename]))
+      rescue
+        puts "#{path} is bad voodoo"
+      end
     end
-    
+
     # Libraries
-    for filename in @asts[:library].keys      
+    for filename in @asts[:library].keys
       File.new("#{dir}/lib/#{filename}", 'w').puts(@ruby2ruby.process(@asts[:library][filename]))
     end
 
     # Singleton files
-    File.new("#{dir}/db/schema.rb", "w").puts(@ruby2ruby.process(@asts[:migration]))
+    begin
+      File.new("#{dir}/db/schema.rb", "w").puts(@ruby2ruby.process(@asts[:migration]))
+    rescue
+    end
     File.new("#{dir}/app/helpers/application_helper.rb", "w").puts(@ruby2ruby.process(@asts[:helper]))
-    File.new("#{dir}/lib/ProxyLibrary.rb", 'w').puts(@ruby2ruby.process(@asts[:proxylib]))
   end
 
   # Return true if the file is not a directory or some other weird thing
@@ -183,7 +226,7 @@ class GCompiler
       end
       line_index += 1
     end
-    @pass_user += "def pass_user\n Thread.current['user'] = return_user\n end"
+    @pass_user += "def pass_user\n Thread.current['user'] = return_user\n Thread.current['response'] = response\n end"
   end
 
   def get_error_cases(filename)
