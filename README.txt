@@ -1,4 +1,3 @@
-Test
 GEM REQUIREMENTS:
 -----------------
 	- Ruby on Rails [version 2.x.x] (Rails 3 not yet supported)
