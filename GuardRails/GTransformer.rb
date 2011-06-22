@@ -83,7 +83,16 @@ class GTransformer
     end
     ast
   end
-
+  
+  def regex_replace(ast)
+    ast.replace! :$~, :$gr_md
+    ast.replace! :$&, :$gr_and
+    ast.replace! :$`, :$gr_left
+    ast.replace! :$', :$gr_right
+    ast.replace! :$+, :$gr_plus
+    ast
+  end
+    
   def transform(asts, ann_lists, model_names, model_filenames, pass_user, require_list=[])
     @parser = RubyParser.new
 
@@ -103,6 +112,7 @@ class GTransformer
       ast = build_policy_objects(ast, ann_list)
       ast = access_policy_transformations(ast)
       ast=insert_requires(ast,require_list)
+    ast=regex_replace(ast)
       asts[:model][filename] = ast
     end
 
@@ -117,6 +127,7 @@ class GTransformer
 
       ast = insert_model_proxies(ast, model_names,filename)
       ast=insert_requires(ast,require_list)
+      ast=regex_replace(ast)
 
       asts[:controller][filename] = ast
     end
@@ -131,14 +142,15 @@ class GTransformer
       ast.insert_into_class! @parser.parse("unloadable"), true
       ast=insert_model_proxies(ast,model_names,filename)
       ast=insert_requires(ast,require_list)
+      ast=regex_replace(ast)
       asts[:library][filename]=ast
     end
 
     for filename in asts[:view].keys do
       ast=asts[:view][filename]
       #ast = ast.insert_at_front(@parser.parse("include 'wrapper'"))
-
-      ast=insert_view_model_proxies(ast,model_names,filename)
+      ast=insert_view_model_proxies(ast,model_names,filename) unless ast.nil?
+      ast=regex_replace(ast) unless ast.nil?
       asts[:view][filename]=ast
     end
 
@@ -148,6 +160,7 @@ class GTransformer
     		 	yield
     			@output_buffer = @output_buffer.transform(:HTML)
 			 end')
+			 regex_replace(asts[:helper])
 
     # Handle taint tracking transformations
     taint_tracking_transformations(asts)

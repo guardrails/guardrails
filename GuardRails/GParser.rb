@@ -275,9 +275,9 @@ class GParser
     return rb
   end
 
-  def convert_to_erb(exp)
+  def convert_to_erb(exp, x)
     translate_for_erb exp
-    ans="<% "+ErbProcessor.new.process(exp)+" %>"
+    ans="<% "+x.process(exp)+" %>"
     ans.gsub! /<%\s*%>/,""
     return ans
   end

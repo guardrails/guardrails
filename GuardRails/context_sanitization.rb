@@ -3,11 +3,11 @@ module ContextSanitization
   
   # Sanitize any HTML tainted chunks based on the sanitization routine they
   # specify in their taint policy
-  def context_sanitize(text)
+  def context_sanitize(text)   
     new_string = ""
     index = 0
     text = text.compress_taint #(States::HTML) #This originally used the 'special compress taint'
-    text.each_chunk do |str,tnt|     
+    text.each_chunk do |str,tnt|   
       if tnt.nil?
         new_string += str
       else          

@@ -97,9 +97,21 @@ class Object
   end
 
   def eval_policy(policy_type)
-    return true if policy_object.nil?
+    if policy_object.nil?
+      if policy_type == :append_access
+        return eval_policy(:write_access)
+      else
+        return true
+      end
+    end
     function = policy_object[policy_type]
-    return true if function.nil?
+    if function.nil?
+      if policy_type == :append_access
+        return eval_policy(:write_access)
+      else
+        return true
+      end
+    end
     return true if Thread.current['loopbreak'] == true
     Thread.current['loopbreak'] = true  
     func = eval(function) 
@@ -144,7 +156,8 @@ class Object
   end
 
   def gr_can_append?(transparent=false)
-    return true if eval_policy(:append_access)
+    return true if eval_policy(:write_access)
+    return eval_policy(:append_access)
     eval_violation(:append_access) unless transparent
   end
 
