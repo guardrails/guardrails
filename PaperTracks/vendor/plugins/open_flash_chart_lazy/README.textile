@@ -1,0 +1,150 @@
+h1. OpenFlashChartLazy
+
+This plugin allows to use the OpenFlashChart version 2 with Rails.
+The idea is to get it as simple and extensible as possible, support future change of "open_flash_chart":http://teethgrinder.co.uk/open-flash-chart-2/
+To support this, I did not reproduce all the OFC attributes on the plugin, just only the basic. All the main attributes are hashes, so if OFC add a new attribute you can add too! and the code still the same!
+
+Initially will only support bar,line and pie graph, but is easy to add support for the other graphs
+I built it to solve a problem, not all the problems that we can have in the world ;-)
+
+Inline suport is limiter to only one graph due to the swf callbacks not available yet, but soon we can support more than one.
+
+h2. Todo
+
+* Universal Rails-Sinatra-Merb compatible
+* More doc
+* Support for other graphs
+* Label annotation for pies
+* May be more specs? mmm
+* Add series matcher block to allow any kind of matcher for series
+* Avoid to specify the start_date for time series for each serie
+* Add periodically_call_remote_graph (rodrigo orrego chileonrails)
+
+h2. Known issues
+
+* Not support for 2 graphs inline yet.
+* Inline graph not compatible with prototype.js
+
+h2. Dependencies
+
+Install this gems before.
+
+Mhash
+<pre><code>
+  gem sources -a http://gems.github.com
+  sudo gem install peterpunk-mhash
+</pre></code>
+
+h2. Install
+
+h3. Rails
+
+<pre><code>
+cd vendor/plugins
+git clone git://github.com/peterpunk/open_flash_chart_lazy.git
+cd ..
+cd ..
+rake open_flash_chart_lazy:install
+</pre></code>
+
+h3. Sinatra
+
+<pre><code>
+cd vendor
+git clone git://github.com/peterpunk/open_flash_chart_lazy.git
+cd ..
+rake open_flash_chart_lazy:install (no tested)
+</pre></code>
+
+h2. Uninstall
+
+<pre><code>
+rake open_flash_chart_lazy:remove
+</pre></code>
+
+h2. Examples for Rails
+
+h3. With remote data
+
+h4. In the controller
+
+<pre><code>
+def progress
+  bar_graph = OpenFlashChartLazy::Line.new("The title of the graph")
+  first_serie = OpenFlashChartLazy::Serie.new(
+  [["2008-1",100],["2008-2",120],["2008-3",130]],
+  {:title=>"Argentina",:start_date=>Time.mktime(2008,1,1),:items=>8})
+  
+  second_serie = OpenFlashChartLazy::Serie.new(
+  [["2008-1",50],["2008-2",40],["2008-3",90]],
+  {:title=>"Tupungato",:start_date=>Time.mktime(2008,1,1),:items=>8})
+
+  bar_graph.add_serie(first_serie)
+  bar_graph.add_serie(second_serie)
+  
+  render :text=>bar_graph.to_graph_json
+end
+
+</pre></code>
+
+h4. In the view
+
+<pre><code>
+<%= remote_graph("my_chart",{:route=>"/admin/dashboard/progress"}) %>
+</pre></code>
+
+h3. With inline data
+
+h4. In the controller
+
+<pre><code>
+def show
+  @pie_chart = OpenFlashChartLazy::Pie.new("Channels")
+  channels=OpenFlashChartLazy::Serie.new([["Wealth",34],["Financial",45]])
+  @pie_chart.add_serie(channels)
+end
+</code></pre>  
+
+h4. In the view
+
+<pre><code>
+<%= inline_graph(@pie_chart) %>
+</pre></code>
+
+h4. Customize the Chart
+
+All graph attributes are hash in general so you can add what you need and if the open_flash_chart add new parameters, just add them.
+
+
+<pre><code>
+bar_graph.x_axis[:labels][:rotate]="vertical"
+bar_graph.x_axis[:labels][:rotate]="vertical"
+bar_graph.x_axis[:colour]="#808080"
+bar_graph.x_axis["grid-colour"]="#A0A0A0"
+bar_graph.x_axis[:stroke]=1
+
+bar_graph.y_axis[:colour]="#808080"
+bar_graph.y_axis[:stroke]=1
+bar_graph.y_axis["grid-colour"]="#A0A0A0"
+</pre></code>
+
+h4. Background attributes
+
+You can specify all of them, this is handle by method missing so just use like this.
+
+<pre><code>
+bar_graph.bg_colour="#FFFFFF"
+</pre></code>
+
+h3. Other implementations for version 2
+
+"http://github.com/korin/open_flash_chart_2/tree/master":http://github.com/korin/open_flash_chart_2/tree/master 
+"The 'Official' implementation":http://pullmonkey.com/2008/7/25/using-a-database-to-populate-an-open-flash-chart-graph
+
+h3. Implementations for version 1
+
+"http://github.com/markcatley/open_flash_chart/tree/master":http://github.com/markcatley/open_flash_chart/tree/master
+
+Enjoy!
+
+Copyright (c) 2008 Pedro Visintin, released under the MIT license

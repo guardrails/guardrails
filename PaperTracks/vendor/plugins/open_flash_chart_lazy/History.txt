@@ -1,0 +1,3 @@
+2008-09-01 
+  * Started to log history
+  * Rename Mash to Mhash to avoid merb conflicts
