@@ -22,8 +22,9 @@ class GTransformer
     return ast if ann_list.nil?
 
     function = "def populate_policies\n"
+    privilege = ""
     for ann in ann_list do
-      function += "#{ann.target}.assign_policy (:#{ann.policy}, '#{ann.lambda.to_s}', :self, self, '#{ann.target}')\n"
+      function += "#{ann.target}.assign_policy (:#{ann.policy}, '#{ann.lambda.to_s}', :self, self, '#{ann.target}')\n" unless ann.type==:func
     end
     function += "end"
     ast.insert_into_class!(@parser.parse(function))
@@ -33,10 +34,22 @@ class GTransformer
       if ann.type == :class
         #                          puts "---- #{ann.lambda.inspect} + #{ann.lambda.class}"
         function += "#{ann.target}.assign_policy (:#{ann.policy}, '#{ann.lambda.to_s}')\n"
+      elsif ann.type == :func
+        puts "Here is a func annotation #{ann.target}"
+        privilege+="alias :gr_#{ann.target} :#{ann.target}\ndef #{ann.target} *args, &body\n"
+        privilege+="  policy_temp=Thread.current['override_policy']\n"
+        privilege+="  Thread.current['override_policy']=#{ann.lambda.to_s}\n"
+        privilege+="  return_temp=send \'gr_#{ann.target}\', *args, &body\n"
+        privilege+="  Thread.current['override_policy']=policy_temp\nend\n"
       end
     end
-    function += "end"
+    function += "end\n"+privilege
+    begin
     ast.insert_into_class!(@parser.parse(function))
+    rescue
+      puts privilege
+      exit
+    end
 
     return ast
   end

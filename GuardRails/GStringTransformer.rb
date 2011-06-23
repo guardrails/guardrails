@@ -131,6 +131,19 @@ class GTransformer
     end
   end
 
+  def create_taint_migration field_list
+    ans_up="  def self.up\n"
+    ans_down="  def self.down\n"
+    for k in field_list
+      k[0]=k[0][0...-3].pluralize
+      for x in k[1]
+        ans_up+="    add_column :"+k[0]+", :"+x+"_taint, :string\n"
+        ans_down+="    remove_column :"+k[0]+", :"+x+"_taint\n"
+      end
+    end
+    return "class AddTaintFields < ActiveRecord::Migration\n"+ans_up+"  end\n\n"+ans_down+"  end\nend\n"
+  end
+
   def taint_tracking_transformations(asts)
     default_transformations(asts)
     begin
@@ -140,6 +153,8 @@ class GTransformer
       tables_to_fields={};
       models_to_fields={};
     end
+    puts "SHDFIHSOGHISOHIGOIHFOIHFVKLNCXLKNVMNXFLSKNGLJK********************"
+    p models_to_fields
 
     for filename in asts[:model].keys do
       #disallow_features(asts[:model][filename])
@@ -149,7 +164,7 @@ class GTransformer
     for filename in asts[:controller].keys do
       #disallow_features(asts[:controller][filename]) if filename == "users_controller.rb"
     end
-
+    asts[:taint_migration]= create_taint_migration models_to_fields
   end
 
   # There are quite a few statements that can break the string tainting. We need to transform

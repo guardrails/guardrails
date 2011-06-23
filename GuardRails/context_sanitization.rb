@@ -6,12 +6,16 @@ module ContextSanitization
   def context_sanitize(text)   
     new_string = ""
     index = 0
+    orig_index = 0
     text = text.compress_taint #(States::HTML) #This originally used the 'special compress taint'
     text.each_chunk do |str,tnt|   
       if tnt.nil?
         new_string += str
-      else          
-        new_text = new_string + after_slice(text,index) 
+      else 
+#        puts "*************************************************"
+#        puts "Looking at: #{str}.  Index: #{index}"
+#        puts "*************************************************"
+        new_text = new_string + after_slice(text,orig_index) 
         taint_layers = Array.new
         case tnt
         when BaseTransformer
@@ -24,65 +28,56 @@ module ContextSanitization
         transformed_string = str
         taint_layers.each do |transform|
           transmethod = nil
-#          puts "^^^^^ #{taint_layers} - #{transform}"
           if !transform.state.has_key?(:HTML)
 #            puts "Transformer is missing an HTML transformation.  Skipping..."
           else
             transmethod = hash_recurse(transform.state[:HTML], new_text, index, str)
-#            puts "
             if transmethod.is_a?(Symbol)
               transmethod = eval("TaintTypes::#{transmethod.to_s}.new")
             end
- #           puts "!!!!!!!!!!!! #{transmethod.inspect} -- #{transmethod.nil?}"
-#            puts transformed_string
             transformed_string = transmethod.safe_class.sanitize(transformed_string)
+#            puts "Result: #{transformed_string} with tnt: #{transformed_string.taint}" 
             if transformed_string.taint.nil?
               index -= 1
             end
-  #          puts "OUTPUT TAINT!!!: #{transformed_string.taint.inspect}"
-  #          puts transformed_string
           end
         end
-        new_string += transformed_string.set_taint(tnt)
+        new_string += transformed_string#.set_taint(tnt)
         index += 1
+        orig_index +=1
       end 
    end
     return new_string
   end
   def hash_recurse(hash, new_text, index, string)
-    #puts "Hash Recursing: #{hash.inspect}, #{new_text.inspect}, #{index.inspect}, #{string.inspect}"
-#    puts "Hash Recursing"
     themethod = nil
     default = nil
     hash.each_pair do |key, val|
- #     puts "GO Pair #{key}, #{val}, Themethod:#{themethod.inspect}"
       if themethod.nil?
         if key != :DEFAULT
-  #        puts "Not Defualt - go #{key}"
           if taint_there?(new_text,key,index)          
-  #          puts "Taint There!"
+#            puts "Taint There!"
             if Hash === val then
-  #            puts "H1"
               themethod = hash_recurse(val, new_text, index, string)
             else
-  #            puts "H2"
               themethod = val
             end
           else
- #           puts "Taint not there!"
+#            puts "Taint not there!"
           end         
         end
       end
     end
     if themethod.nil?
+#      puts "Going with the default"
       if !hash.has_key?(:DEFAULT)
         raise StandardError, "Wanted to use :DEFAULT sanitization routine, but none was specified! String: #{string} - Hash: #{hash}"
       end
- #     puts "Here's the hash: #{hash}"
       themethod = hash[:DEFAULT]
     end
     return themethod
   end
+
   # Get the input string so that everything before the given taint index is safe and
   # any tainted chunks after are removed
   def after_slice(str, index)
@@ -92,7 +87,8 @@ module ContextSanitization
         if count == index
           if n == 0
             return str
-          else
+          else            
+   #       puts "After Slicing #{str[str.taint[n-1][0]+1..str.length-1]}"
             return str[str.taint[n-1][0]+1..str.length-1]
           end
         end
@@ -104,14 +100,12 @@ module ContextSanitization
   #Checks a Nokogiri tree for whether the given taint occurs in the tree at the
   #given xpath
   def taint_there?(str,xpath,index)
-#    puts "TAINT INDEX: #{index}"
     str.gsub($taint_marker,"") # Protect against people trying to match the taint_marker  
 #    puts "All Taint: #{index} ---- " + all_taint_before_index(str,index)
     matches = Nokogiri::HTML(all_taint_before_index(str,index)).xpath(xpath)
 #    puts "Matches:::: " + matches.inspect
     res = false
     matches.each do |m| 
-#      puts "Current State: #{res.inspect}, Looking at: #{m.inspect}"
       res = res || locate_taint(m)
     end
     res

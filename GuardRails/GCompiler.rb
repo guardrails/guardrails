@@ -6,11 +6,10 @@ require 'GTransformer'
 require 'GParser'
 
 class MyRubyProcess < Ruby2Ruby
-  
   def initialize
     super
   end
-  
+
   def process_dstr(exp)
     "\"#{util_dthing2(:dstr, exp)}\""
   end
@@ -28,7 +27,7 @@ class MyRubyProcess < Ruby2Ruby
         case pt.first
         when :str then
           s << dthing_escape(type, pt.last)
-        when :evstr then         
+        when :evstr then
           s << '"+(' << process(pt) << ').to_s()+"' # do not use interpolation here
         else
           raise "unknown type: #{pt.inspect}"
@@ -154,7 +153,7 @@ class GCompiler
       filename = File.basename(path)
       puts path
       begin
-        @asts[:view][path] = RubyParser.new.parse(@gparser.convert_to_ruby(File.read path))
+        @asts[:view][filename] = RubyParser.new.parse(@gparser.convert_to_ruby(File.read path))
       rescue
         puts @gparser.convert_to_ruby(File.read path)
         puts $!.message
@@ -235,9 +234,9 @@ class GCompiler
 
     # Views
     for filename in @asts[:view].keys
-#      path = get_path(filename)
+      path = get_path(filename)
       begin
-        File.new("#{filename}", 'w').puts("<% protect do %> "+@gparser.convert_to_erb(@asts[:view][filename],@ruby2ruby)+"<% end %>")
+        File.new("#{dir}/#{path}", 'w').puts("<% protect do %> "+@gparser.convert_to_erb(@asts[:view][filename],@ruby2ruby)+"<% end %>")
       rescue
         puts "#{path} is bad voodoo"
         txt = File.read "#{dir}/"+path
@@ -256,6 +255,7 @@ class GCompiler
     rescue
     end
     File.new("#{dir}/app/helpers/application_helper.rb", "w").puts(@ruby2ruby.process(@asts[:helper]))
+    File.new("#{dir}/db/migrate/9999999999999_add_taint_fields.rb","w").puts(@asts[:taint_migration])
   end
 
   # Return true if the file is not a directory or some other weird thing
