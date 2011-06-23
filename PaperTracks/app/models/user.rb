@@ -70,6 +70,11 @@ class User < ActiveRecord::Base
     "<a href='/users/show/" + self.id.inspect + "'>" + self.login + "</a>"
   end
 
+  def is_admin?
+     self.roles.each {|role| return true if role.group.groupname == "Administration" }
+     return false
+  end	
+
   def paper_logs_at(time)
     @logs = Array.new
     self.papers.each do |ppr|
