@@ -935,7 +935,7 @@ class String
       self.send("mult",count)
     end
   end
-  
+=begin
   if !"string".respond_to?("old_matching")
     alias old_matching =~   # :nodoc:
   end
@@ -945,6 +945,7 @@ class String
     String.proxy_matchdata($~,self.clone)    
     res
   end
+=end
   #--
   #--------------------------------------
   #       each_char, chr, chars
