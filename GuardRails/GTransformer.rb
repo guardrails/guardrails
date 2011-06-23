@@ -40,7 +40,7 @@ class GTransformer
         privilege+="  policy_temp=Thread.current['override_policy']\n"
         privilege+="  Thread.current['override_policy']=#{ann.lambda.to_s}\n"
         privilege+="  return_temp=send \'gr_#{ann.target}\', *args, &body\n"
-        privilege+="  Thread.current['override_policy']=policy_temp\nend\n"
+        privilege+="  Thread.current['override_policy']=policy_temp\n  return return_temp\nend\n"
       end
     end
     function += "end\n"+privilege

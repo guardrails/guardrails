@@ -34,7 +34,7 @@ class ActiveRecord::Base
     end
   end
   begin
-  alias :old_delete :delete
+    alias :old_delete :delete
   rescue
   end
 
@@ -68,7 +68,7 @@ class Object
   def assign_policy(policy_type, function, target=:self, owner=self, field="")
     if policy_type == :taint
       if !self.nil?
-        t_hash = eval(function)      
+        t_hash = eval(function)
         new_str = TaintSystem::taint_field(self,:HTML, t_hash[:HTML])
         self.taint = new_str.taint
       end
@@ -76,9 +76,12 @@ class Object
       if !self.frozen?
         @policy_object = {} if policy_object.nil?
         @policy_object[policy_type] = function
+        puts "Owner.inspect #{owner.inspect}"
         if owner.is_a?(ActiveRecord::Base)
+          puts "Got in"
           owner.pps_init(field.intern)
           owner.plural_policy_store[field.intern][policy_type] = function
+          puts "\tPlural Policy#{owner.plural_policy_store.inspect}"
         end
       else
         if owner.is_a?(ActiveRecord::Base)
@@ -97,6 +100,7 @@ class Object
   end
 
   def eval_policy(policy_type)
+    return Thread.current['override_policy'].call unless Thread.current['override_policy'].nil?
     if policy_object.nil?
       if policy_type == :append_access
         return eval_policy(:write_access)
@@ -113,16 +117,16 @@ class Object
       end
     end
     return true if Thread.current['loopbreak'] == true
-    Thread.current['loopbreak'] = true  
-    func = eval(function) 
+    Thread.current['loopbreak'] = true
+    func = eval(function)
     if func.arity == 0
-	ret = eval(function).call
+      ret = eval(function).call
     elsif func.arity == 1
-	ret = eval(function).call(Thread.current['user'])
+      ret = eval(function).call(Thread.current['user'])
     elsif func.arity == 2
-	ret = eval(function).call(Thread.current['user'], Thread.current['response'])
+      ret = eval(function).call(Thread.current['user'], Thread.current['response'])
     else
-	raise GuardRailsError, "Annoation Requires Too Many Parameters"
+      raise GuardRailsError, "Annoation Requires Too Many Parameters"
     end
     Thread.current['loopbreak'] = false
     ret
@@ -228,6 +232,7 @@ class Object
       end
     end
   end
+
   def gr_append_check? obj
     return false if obj.class!=self.class
     return false if !respond_to("each")
@@ -249,12 +254,14 @@ class Object
     return true
   end
 end
+
 class String
   def gr_append_check? obj
     return false if !obj.is_a? String
     return obj[0...length]==self
   end
 end
+
 class Hash
   def gr_append_check? obj
     return false if !obj.is_a? Hash
