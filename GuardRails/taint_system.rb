@@ -76,7 +76,7 @@ module TaintSystem
     # Defines the DEFAULT value for BaseTransformers
     def initialize
       default = NoHTML.new
-      @state = {:HTML => {:DEFAULT => default, TaintContexts::LinkTag => LettersOnly.new}, :SQL => SQLDefault.new}
+      @state = {:HTML => {:DEFAULT => default, "//script" => TaintTypes::Invisible.new}, :SQL => SQLDefault.new}
     end
     def state
       @state

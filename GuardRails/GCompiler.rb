@@ -5,10 +5,64 @@ require 'ruby2ruby'
 require 'GTransformer'
 require 'GParser'
 
+class MyRubyProcess < Ruby2Ruby
+  def initialize
+    super
+  end
+
+  def process_dstr(exp)
+    "\"#{util_dthing2(:dstr, exp)}\""
+  end
+
+  def util_dthing2(type, exp)
+    s = []
+
+    # first item in sexp is a string literal
+    s << dthing_escape(type, exp.shift)
+
+    until exp.empty?
+      pt = exp.shift
+      case pt
+      when Sexp then
+        case pt.first
+        when :str then
+          s << dthing_escape(type, pt.last)
+        when :evstr then
+          s << '"+(' << process(pt) << ').to_s()+"' # do not use interpolation here
+        else
+          raise "unknown type: #{pt.inspect}"
+        end
+      else
+        # HACK: raise "huh?: #{pt.inspect}" -- hitting # constants in regexps
+        # do nothing for now
+      end
+    end
+
+    s.join
+  end
+
+  def process_nth_ref(exp)
+    "$gr_#{exp.shift}"
+  end
+
+  def process_grhtml(exp)
+    #p exp
+    ans="%>"+exp[2][1][1]+"<%"
+    exp.shift until exp.empty?
+    return ans
+  end
+
+  def process_grhtmlputs(exp)
+    ans="%><%="+process(exp[1])+"%><%"
+    exp.shift until exp.empty?
+    return ans
+  end
+end
+
 class GCompiler
   def initialize
     @parser 		= RubyParser.new
-    @ruby2ruby 	= Ruby2Ruby.new
+    @ruby2ruby 	= MyRubyProcess.new
     @gparser    = GParser.new
 
     @file_dirs		 	= {}
@@ -182,9 +236,11 @@ class GCompiler
     for filename in @asts[:view].keys
       path = get_path(filename)
       begin
-        File.new("#{dir}/#{path}", 'w').puts(@gparser.convert_to_erb(@asts[:view][filename]))
+        File.new("#{dir}/#{path}", 'w').puts("<% protect do %> "+@gparser.convert_to_erb(@asts[:view][filename],@ruby2ruby)+"<% end %>")
       rescue
         puts "#{path} is bad voodoo"
+        txt = File.read "#{dir}/"+path
+        File.new("#{dir}/"+path, 'w').puts "<% protect do %> #{txt} <% end %>"
       end
     end
 
@@ -199,6 +255,7 @@ class GCompiler
     rescue
     end
     File.new("#{dir}/app/helpers/application_helper.rb", "w").puts(@ruby2ruby.process(@asts[:helper]))
+    File.new("#{dir}/db/migrate/9999999999999_add_taint_fields.rb","w").puts(@asts[:taint_migration])
   end
 
   # Return true if the file is not a directory or some other weird thing

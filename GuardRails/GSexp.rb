@@ -60,15 +60,12 @@ class Sexp
   end
 
   #DON'T USE THIS ONE USE replace2
-  def replace!(match, repl, in_func=false, in_args=false)
-    in_func = (in_func or self[0] == :call)
-    in_args = (in_args or self[0] == :arglist)
-
+  def replace!(match, repl)
     self.each_index {|i|
-      if self[i] == match and in_func and not in_args
+      if self[i] == match
         self[i] = repl
       else
-        self[i].replace!(match, repl, in_func, in_args) if self[i].is_a? Sexp
+        self[i].replace!(match, repl) if self[i].is_a? Sexp
       end
     }
   end
@@ -76,7 +73,7 @@ class Sexp
   def replace2!(match, repl, okay=true)
     in_func = (self[0] == :call)
     in_args = (self[0] == :arglist)
-    in_class = (self[0] == :class)
+    in_class = (self[0] == :class) or self[0]==:colon2
 
     ans=false
     self.each_index {|i|

@@ -22,8 +22,9 @@ class GTransformer
     return ast if ann_list.nil?
 
     function = "def populate_policies\n"
+    privilege = ""
     for ann in ann_list do
-      function += "#{ann.target}.assign_policy (:#{ann.policy}, '#{ann.lambda.to_s}', :self, self, '#{ann.target}')\n"
+      function += "#{ann.target}.assign_policy (:#{ann.policy}, '#{ann.lambda.to_s}', :self, self, '#{ann.target}')\n" unless ann.type==:func
     end
     function += "end"
     ast.insert_into_class!(@parser.parse(function))
@@ -33,10 +34,22 @@ class GTransformer
       if ann.type == :class
         #                          puts "---- #{ann.lambda.inspect} + #{ann.lambda.class}"
         function += "#{ann.target}.assign_policy (:#{ann.policy}, '#{ann.lambda.to_s}')\n"
+      elsif ann.type == :func
+        puts "Here is a func annotation #{ann.target}"
+        privilege+="alias :gr_#{ann.target} :#{ann.target}\ndef #{ann.target} *args, &body\n"
+        privilege+="  policy_temp=Thread.current['override_policy']\n"
+        privilege+="  Thread.current['override_policy']=#{ann.lambda.to_s}\n"
+        privilege+="  return_temp=send \'gr_#{ann.target}\', *args, &body\n"
+        privilege+="  Thread.current['override_policy']=policy_temp\nend\n"
       end
     end
-    function += "end"
+    function += "end\n"+privilege
+    begin
     ast.insert_into_class!(@parser.parse(function))
+    rescue
+      puts privilege
+      exit
+    end
 
     return ast
   end
@@ -83,7 +96,16 @@ class GTransformer
     end
     ast
   end
-
+  
+  def regex_replace(ast)
+    ast.replace! :$~, :$gr_md
+    ast.replace! :$&, :$gr_and
+    ast.replace! :$`, :$gr_left
+    ast.replace! :$', :$gr_right
+    ast.replace! :$+, :$gr_plus
+    ast
+  end
+    
   def transform(asts, ann_lists, model_names, model_filenames, pass_user, require_list=[])
     @parser = RubyParser.new
 
@@ -103,6 +125,7 @@ class GTransformer
       ast = build_policy_objects(ast, ann_list)
       ast = access_policy_transformations(ast)
       ast=insert_requires(ast,require_list)
+    ast=regex_replace(ast)
       asts[:model][filename] = ast
     end
 
@@ -117,6 +140,7 @@ class GTransformer
 
       ast = insert_model_proxies(ast, model_names,filename)
       ast=insert_requires(ast,require_list)
+      ast=regex_replace(ast)
 
       asts[:controller][filename] = ast
     end
@@ -131,14 +155,15 @@ class GTransformer
       ast.insert_into_class! @parser.parse("unloadable"), true
       ast=insert_model_proxies(ast,model_names,filename)
       ast=insert_requires(ast,require_list)
+      ast=regex_replace(ast)
       asts[:library][filename]=ast
     end
 
     for filename in asts[:view].keys do
       ast=asts[:view][filename]
       #ast = ast.insert_at_front(@parser.parse("include 'wrapper'"))
-
-      ast=insert_view_model_proxies(ast,model_names,filename)
+      ast=insert_view_model_proxies(ast,model_names,filename) unless ast.nil?
+      ast=regex_replace(ast) unless ast.nil?
       asts[:view][filename]=ast
     end
 
@@ -148,6 +173,7 @@ class GTransformer
     		 	yield
     			@output_buffer = @output_buffer.transform(:HTML)
 			 end')
+			 regex_replace(asts[:helper])
 
     # Handle taint tracking transformations
     taint_tracking_transformations(asts)
