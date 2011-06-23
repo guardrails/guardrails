@@ -936,6 +936,15 @@ class String
     end
   end
   
+  if !"string".respond_to?("old_matching")
+    alias old_matching =~   # :nodoc:
+  end
+
+  def =~(*args)    
+    res = self.send("old_matching",*args)
+    String.proxy_matchdata($~,self.clone)    
+    res
+  end
   #--
   #--------------------------------------
   #       each_char, chr, chars
