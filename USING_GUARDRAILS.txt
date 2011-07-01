@@ -6,7 +6,7 @@ SETUP- FIRST APP
 
 		~$ ./run.sh yourApp
 
-The new application can be found in the "ProdApps" folder.  In the new application, run the command "rake db:schema:load" to add support for taint tracking to your database.  Note that migrations should not be run in the "ProdApps" folder, only in "RawApps" folder.  You should now be able to launch your applicatoin as though you had deployed the Rails version, but will automatically deploy the updated GaurdRails String library modifications, protecting your application from most injection attacks.
+The new application can be found in the "ProdApps" folder.  In the new application, run rake db:migrate.  This will add the extra fields needed for taint tracking.  This process preserves the database from the "RawApps" version in the "ProdApps" version, but note that any changes to the "ProdApps" database will be lost if the GuardRails transformation is performed again.
 
 ANNOTATIONS- AN INTRODUCTION
 	GuardRails requires you to formally present your security policies via annotations in model folders of the data your wish to protect.  We assume here that you already have a basic grasp of how to use the Ruby on Rails framework.
