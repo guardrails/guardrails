@@ -65,7 +65,7 @@ class GTransformer
   def insert_model_proxies(ast, model_list, filename="")
     for model_name in model_list
       if ast.replace2!(model_name.to_sym, "gr_#{model_name}".to_sym)
-        puts "#{model_name} is being replaced in #{filename}"
+        #puts "#{model_name} is being replaced in #{filename}"
         ast.insert_into_class! @parser.parse(
         "def gr_#{model_name}; ModelProxy.new(#{model_name}); end")
         ast.insert_into_class! @parser.parse(
@@ -80,7 +80,7 @@ class GTransformer
   def insert_view_model_proxies(ast, model_list, filename="")
     for model_name in model_list
       if ast.replace2!(model_name.to_sym, "@gr_#{model_name}".to_sym)
-        puts "#{model_name} is being replaced in #{filename}"
+   #     puts "#{model_name} is being replaced in #{filename}"
         ast=ast.insert_at_front @parser.parse(
         "#{model_name}.populate_policies")
         ast=ast.insert_at_front @parser.parse(
@@ -109,7 +109,7 @@ class GTransformer
   def transform(asts, ann_lists, model_names, model_filenames, pass_user, require_list=[])
     @parser = RubyParser.new
 
-    puts "adding requires: #{require_list}"
+    #puts "adding requires: #{require_list}"
 
     # Transform the models to have policy mappings and such
     for filename in asts[:model].keys do

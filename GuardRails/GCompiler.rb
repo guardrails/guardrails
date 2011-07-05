@@ -116,7 +116,7 @@ class GCompiler
     Find.find("#{dir}/app/models") do |path|
       next unless legal_file(path)
       filename = File.basename(path)
-      puts path
+   #   puts path
       @asts[:model][filename] = @parser.parse(File.read path)
       @file_dirs[filename] = path
     end
@@ -126,7 +126,7 @@ class GCompiler
       next unless legal_file(path)
 
       filename = File.basename(path)
-      puts path
+    #  puts path
       @asts[:controller][filename] = @parser.parse(File.read path)
       @file_dirs[filename] = path
     end
@@ -136,7 +136,7 @@ class GCompiler
       next unless legal_file(path)
 
       filename = File.basename(path)
-      puts path
+     # puts path
       begin
         @asts[:library][filename] = @parser.parse(File.read path)
       rescue Exception
@@ -151,7 +151,7 @@ class GCompiler
       next unless legal_file(path)
 
       filename = File.basename(path)
-      puts path
+    #  puts path
       begin
         @asts[:view][filename] = RubyParser.new.parse(@gparser.convert_to_ruby(File.read path))
       rescue
@@ -163,7 +163,7 @@ class GCompiler
       end
       @file_dirs[filename] = path
     end
-    puts "done with views"
+    #puts "done with views"
 
     # Some single files are needed as well
     begin
@@ -238,7 +238,7 @@ class GCompiler
       begin
         File.new("#{dir}/#{path}", 'w').puts("<% protect do %> "+@gparser.convert_to_erb(@asts[:view][filename],@ruby2ruby)+"<% end %>")
       rescue
-        puts "#{path} is bad voodoo"
+        puts "error on #{path}"
         txt = File.read "#{dir}/"+path
         File.new("#{dir}/"+path, 'w').puts "<% protect do %> #{txt} <% end %>"
       end
