@@ -89,7 +89,7 @@ module TaintTypes
       string.gsub(/[^a-zA-Z]/,"")
     end
   end
-  class AlphaNumeric < LettersOnly
+  class AlphaNumericOnly < LettersOnly
     def self.sanitize(string)
       string.gsub(/[^a-zA-Z0-9]/,"")
     end
@@ -99,22 +99,22 @@ module TaintTypes
       string = ActionView::Helpers::SanitizeHelper.sanitize(string, :tags => []).gsub(/[^a-zA-Z0-9]/,"")
     end
   end
-  class NoHTML < AlphaNumeric
+  class NoHTML < AlphaNumericOnly
     def self.sanitize(string)
       ActionView::Helpers::SanitizeHelper.sanitize(string, :tags => [])
     end
   end
-  class BoldItalic < NoHTML
+  class BoldItalicOnly < NoHTML
     def self.sanitize(string)
       ActionView::Helpers::SanitizeHelper.sanitize(string, :tags => ["b","i"])
     end
   end
-  class BoldItalicUnderline < BoldItalic
+  class BoldItalicUnderlineOnly < BoldItalicOnly
     def self.sanitize(string)
       ActionView::Helpers::SanitizeHelper.sanitize(string, :tags => ["b","u","i"])
     end
   end
-  class HTMLAllowed < BoldItalicUnderline
+  class HTMLAllowed < BoldItalicUnderlineOnly
     def self.sanitize(string)
       string
     end
