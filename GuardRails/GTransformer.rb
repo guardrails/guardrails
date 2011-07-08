@@ -1,6 +1,7 @@
 require 'ruby_parser'
 require 'GSexp'
 require 'GStringTransformer'
+require 'GForm'
 require 'pp'
 
 class GTransformer
@@ -158,12 +159,14 @@ class GTransformer
       ast=regex_replace(ast)
       asts[:library][filename]=ast
     end
-
+    
+    @form_for_alterer=GForm.new
     for filename in asts[:view].keys do
       ast=asts[:view][filename]
       #ast = ast.insert_at_front(@parser.parse("include 'wrapper'"))
       ast=insert_view_model_proxies(ast,model_names,filename) unless ast.nil?
       ast=regex_replace(ast) unless ast.nil?
+      @form_for_alterer.alterFormFors ast, @parser
       asts[:view][filename]=ast
     end
 
