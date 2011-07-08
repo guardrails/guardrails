@@ -115,7 +115,7 @@ class GTransformer
         ast.insert_class_stmt @parser.parse(
         "def #{field}
 					 result = str_raw_#{field}
-					 result.taint = #{field}_taint unless result.nil?
+					 result.taint = #{field}_taint unless result.nil? or !result.taint.nil?
 					 return result
 				 end")
 

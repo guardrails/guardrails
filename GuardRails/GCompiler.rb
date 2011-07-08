@@ -1,68 +1,15 @@
 require 'find'
 require 'rubygems'
 require 'ruby_parser'
-require 'ruby2ruby'
 require 'GTransformer'
 require 'GParser'
+require 'GRuby2Ruby'
 
-class MyRubyProcess < Ruby2Ruby
-  def initialize
-    super
-  end
-
-  def process_dstr(exp)
-    "\"#{util_dthing2(:dstr, exp)}\""
-  end
-
-  def util_dthing2(type, exp)
-    s = []
-
-    # first item in sexp is a string literal
-    s << dthing_escape(type, exp.shift)
-
-    until exp.empty?
-      pt = exp.shift
-      case pt
-      when Sexp then
-        case pt.first
-        when :str then
-          s << dthing_escape(type, pt.last)
-        when :evstr then
-          s << '"+(' << process(pt) << ').to_s()+"' # do not use interpolation here
-        else
-          raise "unknown type: #{pt.inspect}"
-        end
-      else
-        # HACK: raise "huh?: #{pt.inspect}" -- hitting # constants in regexps
-        # do nothing for now
-      end
-    end
-
-    s.join
-  end
-
-  def process_nth_ref(exp)
-    "$gr_#{exp.shift}"
-  end
-
-  def process_grhtml(exp)
-    #p exp
-    ans="%>"+exp[2][1][1]+"<%"
-    exp.shift until exp.empty?
-    return ans
-  end
-
-  def process_grhtmlputs(exp)
-    ans="%><%="+process(exp[1])+"%><%"
-    exp.shift until exp.empty?
-    return ans
-  end
-end
 
 class GCompiler
   def initialize
     @parser 		= RubyParser.new
-    @ruby2ruby 	= MyRubyProcess.new
+    @ruby2ruby 	= GRuby2Ruby.new
     @gparser    = GParser.new
 
     @file_dirs		 	= {}
@@ -90,14 +37,19 @@ class GCompiler
     for filename in @asts[:model].keys do
       ann_lists[filename] = @gparser.get_annotations("#{dir}/#{get_path(filename)}")
     end
+    
     puts "*************Annotations Discovered:*************"
     ann_lists.each_pair do |key, val|
-      puts "#{key} => #{val.inspect}"
-      #               val.each do |val2|
-      ##             puts " --- #{val2.inspect} + #{val2.lambda.class}"
-      #                end
+      puts "#{key} => #{val.inspect}"      
     end
     puts "*************************************************"
+    ann_lists.each_pair do |key, val|
+      val.each do |val2|
+        if !Annotation.policies.include? val2.policy
+          puts "ERROR: No such annotation type :#{val2.policy}!"
+        end
+      end
+    end
     # Get the list of models that extend ActiveRecord::Base
     model_names = []
     model_files = []
@@ -238,7 +190,7 @@ class GCompiler
       begin
         File.new("#{dir}/#{path}", 'w').puts("<% protect do %> "+@gparser.convert_to_erb(@asts[:view][filename],@ruby2ruby)+"<% end %>")
       rescue
-        puts "error on #{path}"
+        puts "#{path} is bad voodoo"
         txt = File.read "#{dir}/"+path
         File.new("#{dir}/"+path, 'w').puts "<% protect do %> #{txt} <% end %>"
       end

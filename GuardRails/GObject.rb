@@ -71,6 +71,12 @@ class Object
         t_hash = eval(function)
         new_str = TaintSystem::taint_field(self,:HTML, t_hash[:HTML])
         self.taint = new_str.taint
+      end     
+    elsif [:read_worlds,:write_worlds].include?(policy_type)
+      if !self.nil?
+        label = eval(function)        
+        new_str = TaintSystem::taint_field(self,:World, label,true)
+        self.taint = new_str.taint
       end
     else
       if !self.frozen?
@@ -145,6 +151,7 @@ class Object
   end
 
   def gr_can_edit?(transparent=false)
+    puts "Checking edit rights on: #{self}, has lambda #{policy_object}"
     return true if eval_policy(:write_access)
     eval_violation(:write_access) unless transparent
   end

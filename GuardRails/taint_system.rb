@@ -6,9 +6,9 @@
 
 # A non-module used to force Rails to load this file
 module TaintSystem
-  
-  # Look for chunks that are HTML-tainted, then assign them the given taint rules
-  def self.taint_field(string, top_level, taint_hash)
+
+  # Look for chunks that are HTML-tainted, then assign them the given taint rules  
+  def self.taint_field(string, top_level, taint_hash, force=false)
     new_string = ""
     string.each_chunk do |str,tnt|
 #      puts "Str: #{str}, Tnt: #{tnt}"
@@ -21,13 +21,23 @@ module TaintSystem
         new_val = str.set_taint(new_taint)
         new_string += new_val
       else
-#        puts "uncomposed"
-      # Ignore if nil, it's untainted      
+      # Ignore if nil, it's untainted (unless forced)
         if tnt == nil || !tnt.state.has_key?(top_level) || tnt.state[top_level].nil?
-#          puts "nilly"
-        new_string += str.set_taint(tnt)
-        else
-#          puts "unnilly"
+          if force 
+            if tnt == nil 
+              new_trans = BaseTransformer.new
+              new_trans.state = {top_level => taint_hash}
+              new_string += str.set_taint(new_trans)              
+            else
+              new_taint = tnt.clone
+              new_taint.state[top_level] = taint_hash
+              new_val = str.set_taint(new_taint)
+              new_string += new_val
+            end
+          else
+            new_string += str.set_taint(tnt)
+          end
+        else         
           new_taint = tnt.clone
           new_taint.state[top_level] = taint_hash
           new_val = str.set_taint(new_taint)
@@ -365,7 +375,7 @@ class String
     stopped = false
     new_val.each do |p|      
       if !(p[1].nil? || p[1].is_a?(TaintTransformer)) 
-        raise StandardError, "Error: Taint Expected to be a Transformer or nil, is #{p[1].class}"
+        raise StandardError, "Taint Expected to be a Transformer or nil, is #{p[1].class}"
       end
       if !stopped
         if p[0] >= length
@@ -935,17 +945,6 @@ class String
       self.send("mult",count)
     end
   end
-=begin
-  if !"string".respond_to?("old_matching")
-    alias old_matching =~   # :nodoc:
-  end
-
-  def =~(*args)    
-    res = self.send("old_matching",*args)
-    String.proxy_matchdata($~,self.clone)    
-    res
-  end
-=end
   #--
   #--------------------------------------
   #       each_char, chr, chars
@@ -1369,11 +1368,7 @@ class String
         String.proxy_matchdata(match_data[count],self)
         # If there is a block
         if block
-          special_params = nil
-          # Simulate the replacement to judge the length of the match 
-            # (why does this work better than 'match_data'?)
-
-          ##ostr[index_cur..ostr.length-1].old_sub(query) {|m| puts "here: #{m}";  len = m.length}          
+          special_params = nil                
 
           special_params = match_data[count]  # Pull the right MatchData/$~
           len = special_params[0].length

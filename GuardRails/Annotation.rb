@@ -6,11 +6,12 @@ class Annotation
   attr_accessor :lambda
   attr_accessor :target
 
-  @@lambda_hash={:always => 'lambda{ true}', :never => 'lambda{ false}', :random => 'lambda{rand(2)==1}'};
+  @@lambda_hash={:always => 'lambda{|obj| true}', :never => 'lambda{|obj| false}', :random => 'lambda{|obj| rand(2)==1}'};
+  @@types 		= [:class, :attr, :assoc, :func]
+  @@policies 	= [:read_access, :write_access, :privilege, :create_access, :destroy_access, :append_access, :taint, :read_worlds, :write_worlds]
 
-  def initialize
-    @types 		= [:class, :attr, :assoc, :func]
-    @policies 	= [:read_access, :write_access, :privilege, :create_access, :destroy_access, :append_access, :taint]
+  def self.policies
+    @@policies
   end
 
   def lambda= obj
@@ -59,11 +60,11 @@ class Annotation
 
   def inspect
     return (	  "Ann.target: " + @target.to_s +
-    ", Ann.type: " + @type.to_s +
+#    ", Ann.type: " + @type.to_s +
     ", Ann.policy: " + @policy.to_s +
     ", Ann.lambda: " + @lambda.to_s)
   end
-
+=begin
   def <=>(obj2)
     a = @types.index(self.type)
     b = @types.index(obj2.type)
@@ -78,7 +79,7 @@ class Annotation
 
     return 1
   end
-
+=end
   # Ruby only implements shallow copying, but we need deep copies
   # of annotations when one annotation is applied to multiple
   # targets.
