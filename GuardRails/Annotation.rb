@@ -6,7 +6,7 @@ class Annotation
   attr_accessor :lambda
   attr_accessor :target
 
-  @@lambda_hash={:always => 'lambda{|obj| true}', :never => 'lambda{|obj| false}', :random => 'lambda{|obj| rand(2)==1}'};
+  @@lambda_hash={:always => 'lambda{true}', :never => 'lambda{false}', :random => 'lambda{rand(2)==1}'};
   @@types 		= [:class, :attr, :assoc, :func]
   @@policies 	= [:read_access, :write_access, :privilege, :create_access, :destroy_access, :append_access, :taint, :read_worlds, :write_worlds]
 
