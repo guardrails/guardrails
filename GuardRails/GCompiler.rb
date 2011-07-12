@@ -205,7 +205,7 @@ class GCompiler
     rescue
     end
     File.new("#{dir}/app/helpers/application_helper.rb", "w").puts(@ruby2ruby.process(@asts[:helper]))
-    File.new("#{dir}/db/migrate/9999999999999_add_taint_fields.rb","w").puts(@asts[:taint_migration])
+    File.new("#{dir}/db/migrate/99999999999999_add_taint_fields.rb","w").puts(@asts[:taint_migration])
   end
 
   # Return true if the file is not a directory or some other weird thing

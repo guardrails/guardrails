@@ -94,12 +94,9 @@ class Object
       if !self.frozen?
         @policy_object = {} if policy_object.nil?
         @policy_object[policy_type] = function
-        puts "Owner.inspect #{owner.inspect}"
         if owner.is_a?(ActiveRecord::Base)
-          puts "Got in"
           owner.pps_init(field.intern)
           owner.plural_policy_store[field.intern][policy_type] = function
-          puts "\tPlural Policy#{owner.plural_policy_store.inspect}"
         end
       else
         if owner.is_a?(ActiveRecord::Base)

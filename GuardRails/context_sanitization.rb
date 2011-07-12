@@ -31,7 +31,7 @@ module ContextSanitization
           if !transform.state.has_key?(:HTML)
             #puts "Transformer is missing an HTML transformation.  Skipping..."
             if transform.state.has_key?(:Worlds)
-              puts "World Data 1: #{transform.state[:Worlds]}"
+             # puts "World Data 1: #{transform.state[:Worlds]}"
               transformed_string = "<span style='color: blue' RACL='#{transform.state[:Worlds][:read].keys*','}' WACL='#{transform.state[:Worlds][:write].keys*','}'>" + transformed_string + "</span>"  
             end
           else
@@ -41,7 +41,7 @@ module ContextSanitization
             end
             transformed_string = transmethod.safe_class.sanitize(transformed_string)
             if transform.state.has_key?(:Worlds)
-              puts "World Data 2: #{transform.state[:Worlds]}"
+              #puts "World Data 2: #{transform.state[:Worlds]}"
               transformed_string = "<span style='color: blue'>" + transformed_string + "</span>"
             end
 #            puts "Result: #{transformed_string} with tnt: #{transformed_string.taint}" 
