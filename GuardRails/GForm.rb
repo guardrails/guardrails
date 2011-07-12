@@ -1,5 +1,7 @@
 class GForm
+  puts "GForming"
   def alterFormFors ast, parser=RubyParser.new
+    puts "Alter forms"
     @@parser=parser
     findFormFor ast
   end
@@ -48,6 +50,7 @@ class GForm
   end
 
   def doTheReplacement name,builder,ast
+    puts "Doing the Replacement! N:#{name}"
     ast=ast[3]
     field=ast[1][1]
     if ast[2].nil?

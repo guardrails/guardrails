@@ -166,6 +166,7 @@ class GTransformer
       #ast = ast.insert_at_front(@parser.parse("include 'wrapper'"))
       ast=insert_view_model_proxies(ast,model_names,filename) unless ast.nil?
       ast=regex_replace(ast) unless ast.nil?
+      puts "Trans for #{filename}"
       @form_for_alterer.alterFormFors ast, @parser
       asts[:view][filename]=ast
     end

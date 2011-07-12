@@ -8,7 +8,7 @@
 module TaintSystem
 
   # Look for chunks that are HTML-tainted, then assign them the given taint rules  
-  def self.taint_field(string, top_level, taint_hash, force=false)
+  def self.taint_field(string, top_level, taint_hash, force = false, extra_param = nil)
     new_string = ""
     string.each_chunk do |str,tnt|
 #      puts "Str: #{str}, Tnt: #{tnt}"
@@ -37,11 +37,24 @@ module TaintSystem
           else
             new_string += str.set_taint(tnt)
           end
-        else         
-          new_taint = tnt.clone
-          new_taint.state[top_level] = taint_hash
-          new_val = str.set_taint(new_taint)
-          new_string += new_val
+        else    
+          if top_level == :Worlds
+            new_taint = tnt.clone
+            new_world = tnt.state[:Worlds].clone
+            if new_world.has_key?(taint_hash.keys[0])
+              new_world[taint_hash.keys[0]].merge!(taint_hash[taint_hash.keys[0]])
+            else
+              new_world[taint_hash.keys[0]] = taint_hash[taint_hash.keys[0]]
+            end
+            new_taint.state[:Worlds] = new_world
+            new_val = str.set_taint(new_taint)
+            new_string += new_val            
+          else
+            new_taint = tnt.clone
+            new_taint.state[top_level] = taint_hash
+            new_val = str.set_taint(new_taint)
+            new_string += new_val
+          end
         end
       end
     end

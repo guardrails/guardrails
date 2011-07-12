@@ -103,9 +103,8 @@ class GCompiler
       next unless legal_file(path)
 
       filename = File.basename(path)
-    #  puts path
       begin
-        @asts[:view][filename] = RubyParser.new.parse(@gparser.convert_to_ruby(File.read path))
+        @asts[:view][path] = RubyParser.new.parse(@gparser.convert_to_ruby(File.read path))
       rescue
         puts @gparser.convert_to_ruby(File.read path)
         puts $!.message
@@ -186,13 +185,12 @@ class GCompiler
 
     # Views
     for filename in @asts[:view].keys
-      path = get_path(filename)
+      path = filename
       begin
-        File.new("#{dir}/#{path}", 'w').puts("<% protect do %> "+@gparser.convert_to_erb(@asts[:view][filename],@ruby2ruby)+"<% end %>")
+        File.new("#{path}", 'w').puts("<% protect do %> "+@gparser.convert_to_erb(@asts[:view][filename],@ruby2ruby)+"<% end %>")
       rescue
-        puts "#{path} is bad voodoo"
-        txt = File.read "#{dir}/"+path
-        File.new("#{dir}/"+path, 'w').puts "<% protect do %> #{txt} <% end %>"
+        txt = File.read path
+        File.new(path, 'w').puts "<% protect do %> #{txt} <% end %>"
       end
     end
 

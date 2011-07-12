@@ -74,8 +74,20 @@ class Object
       end     
     elsif [:read_worlds,:write_worlds].include?(policy_type)
       if !self.nil?
-        label = eval(function)        
-        new_str = TaintSystem::taint_field(self,:World, label,true)
+        worlds = eval(function) 
+        if worlds.class != Array 
+          raise GuardRailsError, "World annotation does not contain an array"
+        end
+        world_hash = {}
+        worlds.each do |w|
+          world_hash[w] = true
+        end
+        if policy_type == :read_worlds
+          t_hash = {:read => world_hash}
+        else
+          t_hash = {:write => world_hash}
+        end
+        new_str = TaintSystem::taint_field(self,:Worlds, t_hash, true)
         self.taint = new_str.taint
       end
     else
