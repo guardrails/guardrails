@@ -25,7 +25,11 @@ class GTransformer
     function = "def populate_policies\n"
     privilege = ""
     for ann in ann_list do
-      function += "#{ann.target}.assign_policy (:#{ann.policy}, '#{ann.lambda.to_s}', :self, self, '#{ann.target}')\n" unless ann.type==:func
+      function += "Thread.current['loopbreak']=true\n"
+      function += "x=#{ann.target}\n"
+      function += "Thread.current['loopbreak']=false\n"
+      function += "x.assign_violation (:#{ann.policy}, '#{ann.violation.to_s}', :self, self, '#{ann.target}')\n" unless ann.violation.nil?
+      function += "x.assign_policy (:#{ann.policy}, '#{ann.lambda.to_s}', :self, self, '#{ann.target}')\n" unless ann.type==:func
     end
     function += "end"
     ast.insert_into_class!(@parser.parse(function))

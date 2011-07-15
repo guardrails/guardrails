@@ -203,8 +203,10 @@ module Wrapper
               failed = false
             end
           end
+          return eval_violation(:append_access) if failed
         end
-        guard_rails_error("Not authorized to use #{method.to_s} on read-only object") if failed
+        #guard_rails_error("Not authorized to use #{method.to_s} on read-only object") if failed
+        eval_violation(:write_access) if failed
       end
       special_function = "gr_#{@target.proxy_reflection.name.to_s}_#{method.to_s}"
       if @parent.respond_to?(special_function)
@@ -262,8 +264,8 @@ module Wrapper
           new_obj = @target.send(method, *args, &block)
           return new_obj if new_obj.gr_can_create?
         else
-          raise GuardRailsError, "Not Authorized to Create New Object"
-          return nil
+          # raise GuardRailsError, "Not Authorized to Create New Object"
+          return eval_violation(:create_access)
         end
       end
 
@@ -272,8 +274,8 @@ module Wrapper
         if @target.gr_can_destroy?
           return @target.send(method, *args, &block)
         else
-          raise GuardRailsError, "Not Authorized to Destroy New Object"
-          return nil
+          # raise GuardRailsError, "Not Authorized to Destroy New Object"
+          return eval_violation(:destroy_access)
         end
       end
 
@@ -313,171 +315,3 @@ module Wrapper
     end
   end
 end
-
-#if return_val.class == Array
-#			new_array = Array.new
-#			for ele in return_val
-#				if ele.gr_is_visible?
-#					ele.setup
-#					new_array << ele
-#				else
-#					# If error is not transparent, we prevent the whole find
-#					# Otherwise, we continue and ignore the unauthorized object.
-#					if ele.error_cases(:many_model_read) != "transparent"
-#						return ele.error_case_result(:many_model_read)
-#					end
-#				end
-#			end
-#			return new_array
-
-# DELETION PERMISSION CHECK
-#if ["delete","destroy"].include? method.to_s
-#	if args[0].is_a? Array
-#		new_args = Array.new
-#		for id in args[0]
-#			found_obj = find(id)
-#
-#					if found_obj.gr_can_destroy?
-#						new_args << id
-#					else
-#						# If error is not transparent, we prevent any deletes from executing
-#						# Otherwise, we continue with deletes and ignore the unauthorized delete.
-#						if found_obj.error_cases(:model_destroy) != "transparent"
-#							return found_obj.error_case_result(:model_destroy)
-#						end
-#					end
-
-#				end
-#				args[0] = new_args
-#				return @target.send(method, *args, &block)
-
-#			else
-#				new_obj = @target.find(args[0])
-#				if new_obj.gr_can_destroy?
-#					return @target.send(method, *args, &block)
-#				else
-#					# Single object destroy is simple because transparent destroy does nothing
-#					return new_obj.error_case_result(:model_destroy)
-#				end
-#			end
-#		end
-
-# DELETION PERMISSION CHECK
-#		if method.to_s == "delete_all"
-#			count = 0
-#			objs_to_delete = Array.new
-#			@target.find(:all, :conditions => args[0]).each { |object|
-#				if object.gr_can_destroy?
-#					objs_to_delete << object
-#				else
-#					# If error is not transparent, we prevent any deletes from executing
-#					# Otherwise, we continue with deletes and ignore the unauthorized delete.
-#					if object.error_cases(:model_destroy) != "transparent"
-#						return object.error_case_result(:model_destroy)
-#					end
-#				end
-#			}
-#			objs_to_delete.each { |object|
-#				object.delete
-#				counter +=1
-#			}
-#			return counter
-#		end
-
-#		# DELETION PERMISSION CHECK
-#		if method.to_s == "destroy_all"
-#			objs_to_delete = Array.new
-#			@target.find(:all, :conditions => args[0]).each { |object|
-#				if object.gr_can_destroy?
-#					objs_to_delete << object
-#				else
-#					# If error is not transparent, we prevent any deletes from executing
-#					# Otherwise, we continue with deletes and ignore the unauthorized delete.
-#					if object.error_cases(:model_destroy) != "transparent"
-#						return object.error_case_result(:model_destroy)
-#					end
-#				end
-#			}
-#			objs_to_delete.each { |object|
-#				object.destroy
-#			}
-#			return objs_to_delete
-#		end
-#
-
-#args = clean_args(args)
-
-# Update_all currently prohibited
-#     if method.to_s == "update_all"
-#      guard_rails_error("update_all is forbidden in GuardRails because of security implications, please manually use update_attributes")
-#   end
-
-#Special Handling so 'count' only includes visible objects
-#      if method.to_s == "count"
-#       group_handling = false
-#      begin
-#       return_val = @target.send("all",*args)
-#       rescue
-#          group_handling = true
-#          if args[0][:group] != nil
-#            group = args[0][:group]
-#            args[0].delete(:group)
-#          end
-#          return_val = @target.send("all",*args)
-#        end
-#        if group_handling
-#          hash_store = Hash.new
-#          return_val.each do |t|
-#            key = t.send(group)
-#            if (hash_store.has_key?(key))
-#              hash_store[key] << t
-#            else
-#              hash_store[key] = Array.new
-#              hash_store[key] << t
-#            end
-#          end
-#          hash_store.each_pair do |key, val|
-#            hash_store[key] = visible_array(val).size
-#          end
-#          return hash_store
-#        else
-#          return return_val.size
-#        end
-#      end
-# --- end 'count' handling
-
-#      return_val = @target.send(method, *args, &block)
-#		return nil if return_val.nil?
-
-# Cover NamedScopes that are returned
-#      if return_val.class == ActiveRecord::NamedScope::Scope
-#        return ModelProxy.new(return_val)
-#      end
-
-# Ensures all the results are visible.
-#		if return_val.class == Array
-#			new_array = Array.new
-#			for ele in return_val
-#				if ele.gr_is_visible?
-#					ele.setup
-#					new_array << ele
-#				else
-#					# If error is not transparent, we prevent the whole find
-#					# Otherwise, we continue and ignore the unauthorized object.
-#					if ele.error_cases(:many_model_read) != "transparent"
-#						return ele.error_case_result(:many_model_read)
-#					end
-#				end
-#			end
-#			return new_array
-#
-#		else
-#			if return_val.respond_to?("gr_is_visible") and not return_val.gr_is_visible?
-#				return return_val.error_case_result(:single_model_read, return_val.class.to_s)
-#			end
-#			return return_val.setup if return_val.respond_to? "setup"
-#			return return_val
-#		end
-#   end
-#end
-#end
