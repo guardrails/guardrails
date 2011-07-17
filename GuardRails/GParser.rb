@@ -112,12 +112,13 @@ class GParser
 
     ann_src.slice!(Annotation_start_regex)
 
-    begin
-      eval("ann.build(ann_src,"+ann_src+")");
-    rescue StandardError => msg
-      puts "Invalid annotation..."
-      puts msg
-    end
+#    begin
+#      eval("ann.build(ann_src,"+ann_src+")");
+#    rescue StandardError => msg
+#      puts "Invalid annotation..."
+#      puts msg
+#    end
+    ann.build(ann_src)
 
     if node[0] == :defn
       # We can now annotate function definitions to be privalidged functions.
