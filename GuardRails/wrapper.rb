@@ -281,12 +281,15 @@ module Wrapper
 
       # READ PERMISSION CHECK - User.find
       return_val = @target.send(method, *args, &block)
-
+      #puts "THIS IS BAD UNLESS FOLLOWED "+return_val.inspect
       return nil if return_val.nil?
 
       # Make sure the object is visible
       return_val.populate_policies
-      return nil unless return_val.gr_is_visible?
+      #puts "HERE IS WHERE I WOULD HOPE SOMTHING HAPPENS"
+      return return_val.eval_violation(:read_access) unless return_val.gr_is_visible?
+      
+     # puts "WELL THAT DIDN'T HAPPEN"
 
       # Check each of the array elements
       if return_val.is_a? Array
