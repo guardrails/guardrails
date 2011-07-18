@@ -38,7 +38,12 @@ class GTransformer
     for ann in ann_list do
       if ann.type == :class
         #                          puts "---- #{ann.lambda.inspect} + #{ann.lambda.class}"
-        function += "#{ann.target}.assign_policy (:#{ann.policy}, '#{ann.lambda.to_s}')\n"
+       # function += "#{ann.target}.assign_policy (:#{ann.policy}, '#{ann.lambda.to_s}')\n"
+        function += "Thread.current['loopbreak']=true\n"
+              function += "x=#{ann.target}\n"
+              function += "Thread.current['loopbreak']=false\n"
+              function += "x.assign_violation (:#{ann.policy}, '#{ann.violation.to_s}', :self, self, '#{ann.target}')\n" unless ann.violation.nil?
+              function += "x.assign_policy (:#{ann.policy}, '#{ann.lambda.to_s}', :self, self, '#{ann.target}')\n" unless ann.type==:func
       elsif ann.type == :func
 #        puts "Here is a func annotation #{ann.target}"
         privilege+="alias :gr_#{ann.target} :#{ann.target}\ndef #{ann.target} *args, &body\n"
