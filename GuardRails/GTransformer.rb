@@ -38,14 +38,14 @@ class GTransformer
     for ann in ann_list do
       if ann.type == :class
         #                          puts "---- #{ann.lambda.inspect} + #{ann.lambda.class}"
-       # function += "#{ann.target}.assign_policy (:#{ann.policy}, '#{ann.lambda.to_s}')\n"
+        # function += "#{ann.target}.assign_policy (:#{ann.policy}, '#{ann.lambda.to_s}')\n"
         function += "Thread.current['loopbreak']=true\n"
-              function += "x=#{ann.target}\n"
-              function += "Thread.current['loopbreak']=false\n"
-              function += "x.assign_violation (:#{ann.policy}, '#{ann.violation.to_s}', :self, self, '#{ann.target}')\n" unless ann.violation.nil?
-              function += "x.assign_policy (:#{ann.policy}, '#{ann.lambda.to_s}', :self, self, '#{ann.target}')\n" unless ann.type==:func
+        function += "x=#{ann.target}\n"
+        function += "Thread.current['loopbreak']=false\n"
+        function += "x.assign_violation (:#{ann.policy}, '#{ann.violation.to_s}', :self, self, '#{ann.target}')\n" unless ann.violation.nil?
+        function += "x.assign_policy (:#{ann.policy}, '#{ann.lambda.to_s}', :self, self, '#{ann.target}')\n" unless ann.type==:func
       elsif ann.type == :func
-#        puts "Here is a func annotation #{ann.target}"
+        #        puts "Here is a func annotation #{ann.target}"
         privilege+="alias :gr_#{ann.target} :#{ann.target}\ndef #{ann.target} *args, &body\n"
         privilege+="  policy_temp=Thread.current['override_policy']\n"
         privilege+="  Thread.current['override_policy']=#{ann.lambda.to_s}\n"
@@ -55,7 +55,7 @@ class GTransformer
     end
     function += "end\n"+privilege
     begin
-    ast.insert_into_class!(@parser.parse(function))
+      ast.insert_into_class!(@parser.parse(function))
     rescue
       puts privilege
       exit
@@ -90,7 +90,7 @@ class GTransformer
   def insert_view_model_proxies(ast, model_list, filename="")
     for model_name in model_list
       if ast.replace2!(model_name.to_sym, "@gr_#{model_name}".to_sym)
-   #     puts "#{model_name} is being replaced in #{filename}"
+        #     puts "#{model_name} is being replaced in #{filename}"
         ast=ast.insert_at_front @parser.parse(
         "#{model_name}.populate_policies")
         ast=ast.insert_at_front @parser.parse(
@@ -106,16 +106,24 @@ class GTransformer
     end
     ast
   end
-  
+
   def regex_replace(ast)
     ast.replace! :$~, :$gr_md
-    ast.replace! :$&, :$gr_and
-    ast.replace! :$`, :$gr_left
-    ast.replace! :$', :$gr_right
-    ast.replace! :$+, :$gr_plus
+    ast.replace! '$&'.to_sym, :$gr_and
+    ast.replace! '$`'.to_sym, :$gr_left
+    ast.replace! "$'".to_sym, :$gr_right
+    ast.replace! "$+".to_sym, :$gr_plus
     ast
   end
-    
+
+  def get_initial_populate_policy models
+    ans="def initial_populate_policy\n"
+    for i in models
+      ans+=i.to_s+".populate_policies\n"
+    end
+    return ans+"end\n"
+  end
+
   def transform(asts, ann_lists, model_names, model_filenames, pass_user, require_list=[])
     @parser = RubyParser.new
 
@@ -135,7 +143,7 @@ class GTransformer
       ast = build_policy_objects(ast, ann_list)
       ast = access_policy_transformations(ast)
       ast=insert_requires(ast,require_list)
-    ast=regex_replace(ast)
+      ast=regex_replace(ast)
       asts[:model][filename] = ast
     end
 
@@ -168,7 +176,7 @@ class GTransformer
       ast=regex_replace(ast)
       asts[:library][filename]=ast
     end
-    
+
     @form_for_alterer=GForm.new
     for filename in asts[:view].keys do
       ast=asts[:view][filename]
@@ -185,7 +193,7 @@ class GTransformer
     		 	yield
     			@output_buffer = @output_buffer.transform(:HTML)
 			 end')
-			 regex_replace(asts[:helper])
+    regex_replace(asts[:helper])
 
     # Handle taint tracking transformations
     taint_tracking_transformations(asts)
@@ -195,7 +203,8 @@ class GTransformer
     app_control = asts[:controller]['application_controller.rb']
     app_control = asts[:controller]['application.rb'] if app_control.nil?
     app_control.insert_class_stmt @parser.parse("before_filter :pass_user"), true
+    app_control.insert_class_stmt @parser.parse("before_filter :initial_populate_policy"), true
     app_control.insert_class_stmt @parser.parse(pass_user)
-
+    app_control.insert_class_stmt @parser.parse(get_initial_populate_policy(model_names))
   end
 end
