@@ -25,8 +25,12 @@ GUARDRAILS SETUP:
    	5.  To test your setup, in the root of the GuardRails package, execute the "run.sh" shell script,
 	    passing in the name of the folder containing your application in the RawApps directory:
 	        ~$ ./run.sh yourApp
-	6.  Run rake db:migrate in your new application. This will add the extra fields needed for taint tracking. This process preserves the database from the "RawApps" version in the "ProdApps" version, but note that any changes to the "ProdApps" database will be lost if the GuardRails transformation is performed again. 
-   *** Refer to the USING_GAURDRAILS.txt file for more details on using features of GuardRails
+        6.  Run rake db:migrate in your new application. This will add the extra fields needed for taint 
+            tracking. This process preserves the database from the "RawApps" version in the "ProdApps" 
+            version, but note that any changes to the "ProdApps" database will be lost if the GuardRails
+            transformation is performed again.
+
+Update: In the latest version of GuardRails, rake db:migrate only needs to be run the first time the transformation is performed. In subsequent transformations, the database in the "ProdApps" folder is preserved, rather than replaced by the one in "RawApps". If you still would like the "ProdApps" database to be replaced, run the GuardRails transformation with the "-r" flag and then re-run rake db:migrate in the "ProdApps" folder. 
 
 GEM MODIFICATIONS (Improved explanation coming soon, this portion can be avoided for now):
 ------------------
