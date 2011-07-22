@@ -102,7 +102,7 @@ class Object
         new_str = TaintSystem::taint_field(self,:HTML, t_hash[:HTML])
         self.taint = new_str.taint
       end
-    elsif [:read_worlds,:write_worlds].include?(policy_type)
+    elsif [:read_worlds,:write_worlds,:read_worlds_r, :write_worlds_r].include?(policy_type)
       if !self.nil?
         worlds = eval(function)
         if worlds.class != Array
@@ -114,8 +114,12 @@ class Object
         end
         if policy_type == :read_worlds
           t_hash = {:read => world_hash}
-        else
+        elsif policy_type == :read_worlds_r
+          t_hash = {:readR => world_hash}
+        elsif policy_type == :write_worlds
           t_hash = {:write => world_hash}
+        else policy_type == :write_worlds_r
+          t_hash = {:writeR => world_hash}
         end
         new_str = TaintSystem::taint_field(self,:Worlds, t_hash, true)
         self.taint = new_str.taint

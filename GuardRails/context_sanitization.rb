@@ -1,8 +1,13 @@
 module ContextSanitization
   $taint_marker = "**gr**"
   
+  def get_keys(hash)
+    return [] if hash.nil?     
+    return hash.keys
+  end
+
   # Sanitize any HTML tainted chunks based on the sanitization routine they
-  # specify in their taint policy
+  # specify in their taint policy 
   def context_sanitize(text)   
     new_string = ""
     index = 0
@@ -31,18 +36,28 @@ module ContextSanitization
           if !transform.state.has_key?(:HTML)
             #puts "Transformer is missing an HTML transformation.  Skipping..."
             if transform.state.has_key?(:Worlds)
-             # puts "World Data 1: #{transform.state[:Worlds]}"
-              transformed_string = "<span style='color: blue' RACL='#{transform.state[:Worlds][:read].keys*','}' WACL='#{transform.state[:Worlds][:write].keys*','}'>" + transformed_string + "</span>"  
+             #puts "World Data 1: #{transform.state[:Worlds]}"
+              transformed_string = "<span RACL='#{(get_keys(transform.state[:Worlds][:read])+get_keys(transform.state[:Worlds][:readR]))*','}' WACL='#{(get_keys(transform.state[:Worlds][:write])+get_keys(transform.state[:Worlds][:writeR]))*','}'>" + transformed_string + "</span>"  
+              if transformed_string == TaintTypes::TType.tag_protect(transformed_string)
+                transformed_string = TaintTypes::TType.tag_protect(transformed_string, get_keys(transform.state[:Worlds][:readR]), get_keys(transform.state[:Worlds][:writeR]))
+              end
             end
           else
             transmethod = hash_recurse(transform.state[:HTML], new_text, index, str)
             if transmethod.is_a?(Symbol)
               transmethod = eval("TaintTypes::#{transmethod.to_s}.new")
-            end
+            end            
             transformed_string = transmethod.safe_class.sanitize(transformed_string)
+
+            #puts "World Data 2: #{transform.state[:Worlds]}"
+            afterString = transmethod.safe_class.tag_protect(transformed_string)
+            if transformed_string == afterString && transform.state.has_key?(:Worlds)
+              transformed_string = TaintTypes::TType.tag_protect(transformed_string, get_keys(transform.state[:Worlds][:readR]), get_keys(transform.state[:Worlds][:writeR]))
+            else
+              trasnformed_string = afterString
+            end
             if transform.state.has_key?(:Worlds)
-              #puts "World Data 2: #{transform.state[:Worlds]}"
-              transformed_string = "<span style='color: blue'>" + transformed_string + "</span>"
+              transformed_string = "<span RACL='#{(get_keys(transform.state[:Worlds][:read])+get_keys(transform.state[:Worlds][:readR]))*','}' WACL='#{(get_keys(transform.state[:Worlds][:write])+get_keys(transform.state[:Worlds][:writeR]))*','}'>" + transformed_string + "</span>"
             end
 #            puts "Result: #{transformed_string} with tnt: #{transformed_string.taint}" 
             if transformed_string.taint.nil?

@@ -16,7 +16,7 @@ class Annotation
     :create_access=> 'lambda{raise GuardRailsError, "Not authorized to create object"}',
     :destroy_access=> 'lambda{raise GuardRailsError, "Not authorized to destroy object"}'}
   @@types 		= [:class, :attr, :assoc, :func]
-  @@policies 	= [:read_access, :write_access, :privilege, :create_access, :destroy_access, :append_access, :taint, :read_worlds, :write_worlds]
+  @@policies 	= [:read_access, :write_access, :privilege, :create_access, :destroy_access, :append_access, :taint, :read_worlds, :write_worlds, :read_worlds_r, :write_worlds_r]
 
   def self.policies
     @@policies
@@ -28,7 +28,7 @@ class Annotation
 
   def build str
     ast=RubyParser.new.parse "build("+str+")"
-    p ast=ast[3]
+    ast=ast[3]
     @violation=nil
     @policy=ast[1][1]
     if ast[-1][0]==:lit and ast[-1][1].is_a? Symbol
