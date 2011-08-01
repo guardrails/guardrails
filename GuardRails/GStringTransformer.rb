@@ -153,8 +153,6 @@ class GTransformer
       tables_to_fields={};
       models_to_fields={};
     end
-#    puts "SHDFIHSOGHISOHIGOIHFOIHFVKLNCXLKNVMNXFLSKNGLJK********************"
-  #  p models_to_fields
 
     for filename in asts[:model].keys do
       #disallow_features(asts[:model][filename])

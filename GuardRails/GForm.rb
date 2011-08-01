@@ -71,7 +71,7 @@ class GForm
   end
 
   def getSexpFormFor name,field
-    return @@parser.parse("{\"disabled\"=>((#{name.to_s}.#{field.to_s}.gr_can_edit?())?(false):(true))}")
+    return @@parser.parse("{\"disabled\"=>(((#{name.to_s}.#{field.to_s}.gr_can_append?() && #{name.to_s}.gr_can_append?()))?(false):(true))}")
   end
 
   def getFormForName ast

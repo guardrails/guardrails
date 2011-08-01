@@ -8,10 +8,33 @@
 module TaintSystem
 
   # Look for chunks that are HTML-tainted, then assign them the given taint rules  
+  # Note: This does not modify the string, just returns the modified copy
+  #
+  # Parameters:
+  # ------------------
+  #  string = the string to be tainted (String)
+  #  top_level = symbol representing the top level taint context to modify (Symbol)
+  #  taint_hash = the new Hash to replace the current hash for the given top-level context (Hash)
+  #  force = boolean representing whether or not the new taint_hash will be applied no matter what
+  #     - if FALSE, the taint_hash will only be added to the chunks of the string that
+  #       are already tainted in the given top-level context
+  #     - if TRUE, the taint_hash will ALWAYS be applied, regardless of whether or not
+  #       the given chunk is already tainted in the given top-level context
+  #  extra_param = way to add a new parameter (I don't think I use this right now)
+  # ------------------
+  #
+
   def self.taint_field(string, top_level, taint_hash, force = false, extra_param = nil)
     new_string = ""
+
+    # Iterate through each of the chunks in the string
     string.each_chunk do |str,tnt|
-#      puts "Str: #{str}, Tnt: #{tnt}"
+
+      # If the chunk has a ComposedTransformer, the new taint_hash needs to be 
+      # applied to ALL of the BaseTransformers that make up the ComposedTransformer.
+      # Note that this assumes this will NOT be called on a RollbackTransformer, which
+      # shouldn't happen anyway.
+
       if ComposedTransformer === tnt 
         newTransformer = tnt.clone
         newTransformer.copy_clone!
@@ -21,9 +44,12 @@ module TaintSystem
         new_val = str.set_taint(new_taint)
         new_string += new_val
       else
-      # Ignore if nil, it's untainted (unless forced)
+
+      # If taint is nil, there is no top_level key in the taint hash, or if that key maps to nil
+      # In this case, it is untainted and can be skipped (unless force = true)
+
         if tnt == nil || !tnt.state.has_key?(top_level) || tnt.state[top_level].nil?
-          if force 
+          if force  # If forced, the new taint_hash has to be applied anyway
             if tnt == nil 
               new_trans = BaseTransformer.new
               new_trans.state = {top_level => taint_hash}
@@ -34,21 +60,36 @@ module TaintSystem
               new_val = str.set_taint(new_taint)
               new_string += new_val
             end
-          else
+          else   # If not forced, we can just add the chunk to the new string as is and move on
             new_string += str.set_taint(tnt)
           end
-        else    
+        else 
+
+          # The :Worlds annotation type needs to be handled slightly differently
+          # if there are existing read and write worlds, we want to merge the two
+          # sets of worlds together.
+
           if top_level == :Worlds
             new_taint = tnt.clone
-            new_world = tnt.state[:Worlds].clone
+            new_world = tnt.state[:Worlds].clone     
+
+            # Note that the specific reference here to index 0 means that the function
+            # expects a hash with one and only one entry (as in just read or just write
+            # but not a mixture of the two)
             if new_world.has_key?(taint_hash.keys[0])
               new_world[taint_hash.keys[0]].merge!(taint_hash[taint_hash.keys[0]])
             else
               new_world[taint_hash.keys[0]] = taint_hash[taint_hash.keys[0]]
             end
+
             new_taint.state[:Worlds] = new_world
             new_val = str.set_taint(new_taint)
             new_string += new_val            
+
+          # In the case of all other annotation types, the current taint hash is simply
+          # replaced with the new taint hash.  In the complete version of GuardRails,
+          # this should be modified to support the blending of taint hashes marked with
+          # an exclamation point (see paper)
           else
             new_taint = tnt.clone
             new_taint.state[top_level] = taint_hash
@@ -60,56 +101,91 @@ module TaintSystem
     end
     new_string
   end
+
+  # The root Transformer class.  Note that it is probably never useful to
+  # assign a chunk an instance of this class as it only sanitizes with
+  # the Identity transformation (does nothing)
+  # -----------------------------------------------------------------
+  # Like the TaintTransformer class, all descendents must implement the
+  # 'transform' method, which takes a given string and context information
+  # and returns a transformed version of the string based on the rules of the
+  # given transformer
+
   class TaintTransformer
     def transform(string, top_level_context=nil, additional_context=nil)
       return TaintTypes::Identity.sanitize(string)
     end
   end
+
+  # The Rollback Transformer is used to handle cases where the same string
+  # might get sanitized multiple times in a row.  This happens, for example,
+  # if a string is included in a snippet on one page and is sanitized on that
+  # page before being included as part of layout where it will be sanitize again
+  # Since the context for sanitization should be based on the FINAL state of the 
+  # HTML, the rollback transformer restores the original version of the string 
+  # (and taint status) so that it can be resanitized in the new context.  This
+  # means that while the same string can be sanitized multiple times, only the
+  # final one counts.
+
   class RollbackTransformer < TaintTransformer
     attr_accessor :backup
     def transform(*args)
       return @backup
     end
   end
+
+  # Like the TaintTransformer class, IdentityTransformers just return a copy
+  # of the string that is unmodified.  This should not technically be different
+  # than the behavior of the TaintTransformer class.  This class may not currently
+  # be in use.
+
   class IdentityTransformer < TaintTransformer
     def transform(*args)
       return args[0]
     end
   end
-  class ComposedTransformer < TaintTransformer
-    attr_accessor :transformers
-    def initialize
-      @transformers = []
-    end
-    def transform(string, top_level_context = nil, additional_context=nil)
-      activeString = string
-      @transformers.each do |t|
-        activeString = t.transform(activeString, top_level_context, additional_context)
-      end
-      return activeString
-    end
-    def copy_clone!
-      for n in (0..@transformers.length-1)
-        @transformers[n] = @transformers[n].clone
-      end
-    end
-  end
+
+  # The BaseTransformer is the most used of the Transformers as it provides the
+  # best way of matching contexts with sanitization routines (or more generally:
+  # "transformations").  Every BaseTransfromer contains a hash of top-level taint
+  # contexts (the @state field).  Each of these top-level contexts may map to 
+  # additional hashes which may contain more nested hashes representing sub-contexts 
+  # of the top-level context. 
+
   class BaseTransformer < TaintTransformer 
     include TaintTypes
-    # Defines the DEFAULT value for BaseTransformers
+
+    # **** Defines the DEFAULT value for BaseTransformers ****
     def initialize
       default = NoHTML.new
       @state = {:HTML => {:DEFAULT => default, "//script" => TaintTypes::Invisible.new}, :SQL => SQLDefault.new}
+      # A note about these state hashes:  All of the transformation methods 
+      # mapped to by contexts are 'TaintType' objects as defined in the taint_types.rb
+      # file.  These TaintType objects must be INSTANCES of the appropriate TaintType
+      # class, even though they don't contain any state, per say.  This is because
+      # classes cannot automatically be serialized when inserted into the database,
+      # only instances can.  So just don't forget to map to INSTANCES in this has, no
+      # CLASSES.
     end
+
+    # Accessors for the state variable
     def state
       @state
     end
     def state=(new_val)
       @state = new_val
     end
+
     def self.safe
       return nil
     end
+
+    # The transform method for a BaseTransformer maps the given top-level context
+    # to the corresponding transformation method as specified by the @state hash.
+    # It is important to note that string transformation does not always call this
+    # method, rather some contexts (like :HTML) implement their own technique of 
+    # mapping context to transformation based on the data in the BaseTransformer.
+
     def transform(string, top_level_context=nil, additional_context=nil) 
       if top_level_context.nil?; return Identity.sanitize(string); end
       if state[top_level_context].nil?; return Identity.sanitize(string); end
@@ -121,7 +197,11 @@ module TaintSystem
       end
       return "undefined"
     end
-    # BaseTransformer equality requires the same value and html_state
+
+    # This method for determining whether or not two transformers are the same
+    # is necessary for good taint compressions (merging two identically tainted
+    # and adjacent chunks).  Currently this doesn't quite work and should be fixed.
+    # This does not cause any problems, but it probably worsens performance.
     def ==(other)
       return false
       # This needs to be fixed
@@ -145,13 +225,61 @@ module TaintSystem
         return false
       end
     end
+
     def inspect
       "#<BaseTransformer::#{@state.to_s}>"
     end
   end
 
-  # A proxy for a MatchData object, typcially for the one in $~.  Returns only strings
-  # that have the proper taint status.
+  # ComposedTransformers are necessary when two chunks with different taint statuses
+  # (different Transformers) must be blended together.  This is required by a small
+  # number of tricky string functions.  Assuming the two (or more) chunks are all 
+  # associated with BaseTransformers, the ComposedTransformer stores an array of all
+  # of these Transformers, which are then all applied when a string is transformed.
+
+  class ComposedTransformer < TaintTransformer
+    attr_accessor :transformers
+    def initialize
+      @transformers = []
+    end
+
+    # Transforms the given string with all of the BaseTransformes stored in the
+    # @transformers array.  Note that all of the transformations are currently
+    # applied one after another in a random order.  This should be fixed so that
+    # the transformations are applied in all order and then checked to ensure they
+    # produce the same result, throwing an error if they do not.  Note here again,
+    # that this function is not always called when a string is tranformed using a
+    # ComposedTransformer.  HTML, for example, has its own custom sanitization setup
+    # for ComposedTransformers that does not call this method.
+
+    # TODO: Change ComposedTransformer transformation to more accurately reflect the
+    # description given in the paper
+
+    def transform(string, top_level_context = nil, additional_context=nil)
+      activeString = string
+      @transformers.each do |t|
+        activeString = t.transform(activeString, top_level_context, additional_context)
+      end
+      return activeString
+    end
+
+    # Makes a "deep copy" of itself by cloning all of the stored transformers
+    def copy_clone!
+      for n in (0..@transformers.length-1)
+        @transformers[n] = @transformers[n].clone
+      end
+    end
+
+  end
+
+  # Since global MatchData objects ($~, $1, etc.) are handled natively, they do 
+  # not preserve taint status and cannot be modified outside of native code.
+  # For this reason, we create our own set of globals identical to the originals
+  # with the exception that the correct taint status is preserved.  This is handeld
+  # by wrapping the original MatchData object with a MatchDataProxy which determines
+  # the correct taint status based on the original string from which the match was
+  # made
+
   class MatchDataProxy
     def initialize(target, string)
       @target = target
@@ -326,6 +454,9 @@ class Hash
 end
 =end
 
+# TODO: Are the following two definitions necessary? We don't much care about integers
+# or floats...
+
 # Kernel modified to add support for String to Number casting via +Integer+ and +Float+.
 module Kernel
 
@@ -366,30 +497,51 @@ end
 class String  
   include TaintSystem
   include ContextSanitization
-  # An ordered hash representing a set of mappings between the last character index of each chunk, 
-  # and the 2-digit hexidecimal string representing that chunk's taint
+
+  # Taint is the main variable used to store a string's taint information.  It is implemented
+  # as an array, with elements that are also arrays, but limited to containing two elements.
+  # Each of the sub-arrays (pairs) corresponds to a unique "chunk" in the string, such that 
+  # each "chunk" can have its own taint status (associated Transformer).  The first element
+  # in the pair is an integer giving the index of the final index of the appropriate chunk.
+  # The second element is the transformer associated with that chunk, or nil if it has none
+  # or is untainted. 
+  # Example:
+  #    [[6, Transformer1], [14, nil], [27, Transformer3]]
+
   attr_accessor :taint
 
   alias raw_set_taint taint=
   alias get_taint taint
-  # The taint setter.  Makes sure that the taint for each chunk is in character order to prevent
-  # problems, and also trims any taint that refers to characters beyond the length of the string.
+  
+  # The taint setter.  Makes sure that the taint obeys rules pertaining to the taint 
+  # structure: mainly that no chunk can have a final character outside of the length 
+  # string, and that the chunks are in the order they appear in the string.  If the
+  # chunks are out of order in the taint, everything will break.
+
   def taint=(new_val)
+
+    # Quickly bail out if new taint is nil
     if new_val == nil
       raw_set_taint(nil)
       return
     end
-    if self.length < 1
+    # Can't assign a taint status to "" string
+    if self.length < 1 
       raw_set_taint({})
       return 
     end
+
     new_pairs = Array.new
     last_key = -1
     stopped = false
     new_val.each do |p|      
+
+      # Validate that the second element of each pair is indeed a Transformer or nil
       if !(p[1].nil? || p[1].is_a?(TaintTransformer)) 
         raise StandardError, "Taint Expected to be a Transformer or nil, is #{p[1].class}"
       end
+
+      # Check that the first element of each pair does not exceed length of string
       if !stopped
         if p[0] >= length
           if last_key != length-1
@@ -402,14 +554,29 @@ class String
         end
       end
     end
+    
+    # Sort all of the pairs so that they are in order by the index of the final
+    # character of the chunk to which they refer.  In other words, they are in the
+    # order you would expect them to be in
     new_pairs = new_pairs.sort {|a,b| (a[0].to_i <=> b[0].to_i)}
+    
+    # Officially set the taint to the modified new value
     raw_set_taint(new_pairs)
   end
 
+  # Transform the string with the given context information.  Basically, iterates
+  # through each of the chunks and calls 'transform' on the corresponding transformer,
+  # (passing in the same context information) then concatenates the results of each
+  # transformation to obtain the final string
+
   def transform(base_context = nil, additional_context = nil)
+    
+    # The HTML top-level context gets its own transformation method since it is
+    # extra complicated
     if base_context == :HTML
       return transform_HTML(additional_context)
     end
+
     if self.taint.nil?; return self; end
     new_string = ""
     self.each_chunk do |str,tnt|
@@ -422,17 +589,42 @@ class String
     return new_string
   end
 
+
+  # Sanitize the string for the HTML context, note that, for each chunk, the
+  # additional context required to judge how the string should be transformed
+  # is dictated by the other contents of the string.  Thus, the whole string
+  # contents is all of the context information that is needed here
+
   def transform_HTML(additional_context = nil)
     old_version = self.clone
     new_self = self.clone
+
+    # In order to ensure that no chunks are sanitized twice, and that each
+    # chunk is sanitized in accordance with the context it appears in its final
+    # place of use, roll back any chunks in the current string that have a 
+    # rollback transformer (see definition of RollbackTransformer for more of 
+    # an explanation)
     new_self = run_rollback(new_self)  
+
+    # Call the context sanitization routine for HTML (see context_sanitization.rb
+    # for a detailed description of how this process works)
     res = context_sanitize(new_self)
+
+    # Match the resulting string with a new RollbackTransformer, so that the
+    # new transformations can be reverted if it turns out that the string will
+    # be used in yet a larger HTML context
     new_trans = RollbackTransformer.new
     new_trans.backup = old_version       
+
+    # Return the HTML-transformed version of the string
     res = res.set_taint(new_trans)
     res
   end
 
+  # Iterate through each of the chunks and check to see if they
+  # are paired with a Rollback transformer.  If so, then use the Transformer
+  # to revert the chunk to its original value (which may actually contain 
+  # more than one chunk)
   def run_rollback(str)
     new_str = ""
     str.each_chunk do |val, tnt|
@@ -446,20 +638,14 @@ class String
     new_str
   end
 
-  def encode_taint
-    new_taint = []
-    @taint.each do |pair|
-      new_taint << [pair[0],pair[1].encode]
-    end
-    return new_taint.inspect
-  end
-  def decode_taint(val)   
-    new_taint = []
-    val.each do |pair|
-      new_taint << [pair[0],BaseTransformer.decode(pair[1])]
-    end
-    raw_set_taint(new_taint)
-  end
+  # Returns an array of integers, with each element in the array representing
+  # a deeper version number.  This is used to judge whether or not the user
+  # is running 1.8 or 1.9, which have dramatically different behavior with 
+  # respect to individual characters in Strings. In order to preserve correctness,
+  # some methods have two versions, one to run in each case, and judge which is
+  # appropriate with this function.
+  # Example Return Value:
+  #   [1, 9, 1]
 
   def self.version  # :nodoc:
     depths = RUBY_VERSION.split(".")
@@ -798,8 +984,6 @@ class String
   # seperate _chunks_ in the taint information, and strings that have no taint
   # are marked as having taint of "00"
   #   Assumed to be Secure
-
-
 
   def +(*args)
     args.map! {|s| s.to_s }
@@ -1966,6 +2150,7 @@ class String
   # Works fine.  Splits up the string in terms of pre-match, match, and post-match with the
   # first result from the left side.
   #  Should be Secure, but watch use of $~
+
   def partition(sep)
     if taint_relevant?
       partitioner(sep,lambda {|m| index(m)})
@@ -1977,6 +2162,7 @@ class String
   # Works fine.  Splits up the string in terms of pre-match, match, and post-match with the
   # first result from the right side.
   #  Should be Secure, but watch use of $~
+
   def rpartition(sep)
     if taint_relevant?
       partitioner(sep,lambda {|m| rindex(m)})
