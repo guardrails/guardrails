@@ -147,18 +147,11 @@ class Object
   # is defined and the object's class descends from the 
   # ActiveRecord class, it will look for the policy in the
   # object's class (the corresponding model object)
-  
-  # TODO: This might not work if the object's class "descends" 
-  # from ActiveRecord::Base, but does not have it as an 
-  # immediate superclass
-
+ 
   def policy_object
     return @policy_object if !@policy_object.nil?
-    cls = self.class
-    if cls.respond_to?("superclass")
-      if cls.superclass == ActiveRecord::Base
-        return cls.policy_object
-      end
+    if self.is_a?(ActiveRecord::Base)
+      return self.class.policy_object
     end
     return nil
   end
@@ -168,15 +161,11 @@ class Object
 
   def violation_object
     return @violation_object if !@violation_object.nil?
-    cls = self.class
-    if cls.respond_to?("superclass")
-      if cls.superclass == ActiveRecord::Base
-        return cls.violation_object
-      end
+    if self.is_a?(ActiveRecord::Base)
+        return self.class.violation_object
     end
     return nil
   end
-
 
   def assign_policy(policy_type, function, target=:self, owner=self, field="")
 

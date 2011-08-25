@@ -190,10 +190,9 @@ module TaintSystem
       if top_level_context.nil?; return Identity.sanitize(string); end
       if state[top_level_context].nil?; return Identity.sanitize(string); end
       sub_state = state[top_level_context]
-      if Hash === sub_state
-       
-      elsif TType === sub_state.new
-        return sub_state.sanitize(string)
+      if Hash === sub_state      
+      elsif TType === sub_state
+        return sub_state.class.sanitize(string)
       end
       return "undefined"
     end
@@ -243,24 +242,139 @@ module TaintSystem
       @transformers = []
     end
 
-    # Transforms the given string with all of the BaseTransformes stored in the
-    # @transformers array.  Note that all of the transformations are currently
-    # applied one after another in a random order.  This should be fixed so that
-    # the transformations are applied in all order and then checked to ensure they
-    # produce the same result, throwing an error if they do not.  Note here again,
+    def pull_worlds
+      read_set = []
+      write_set = []
+      readR_set = []
+      writeR_set = []
+      first = true
+      transformers.each do |trans|
+        if trans.is_a?(BaseTransformer)
+          if trans.state.has_key?(:Worlds)
+            worlds = trans.state[:Worlds]
+            if worlds.has_key?(:read)
+              if first
+                read_set = worlds[:read].keys
+              else
+                read_set = read_set & worlds[:read].keys
+              end
+            else
+              read_set = []
+            end
+            if worlds.has_key?(:write)
+              if first
+                write_set = worlds[:write].keys
+              else
+                write_set = write_set & worlds[:write].keys
+              end
+            else
+              write_set = []
+            end
+            if worlds.has_key?(:readR)
+              if first
+                readR_set = worlds[:readR].keys
+              else
+                readR_set = readR_set & worlds[:readR].keys
+              end
+            else
+              readR_set = []
+            end
+            if worlds.has_key?(:writeR)
+              if first
+                writeR_set = worlds[:writeR].keys
+              else
+                writeR_set = writeR_set & worlds[:writeR].keys
+              end
+            else
+              writeR_set = []
+            end
+          else
+            read_set = []
+            write_set = []
+            readR_set = []
+            writeR_set = []
+          end          
+        else
+          raise GuardRailsError, "Nested Composed Transformers Unsupported"
+        end     
+        first = false
+      end
+      new_hash = {}
+      if read_set.length > 0
+        sub_hash = {}
+        for key in read_set do
+          sub_hash[key] = true
+        end
+        new_hash[:read] = sub_hash
+      end
+      if write_set.length > 0
+        sub_hash = {}
+        for key in write_set do
+          sub_hash[key] = true
+        end
+        new_hash[:write] = sub_hash
+      end
+      if readR_set.length > 0
+        sub_hash = {}
+        for key in readR_set do
+          sub_hash[key] = true
+        end
+        new_hash[:readR] = sub_hash
+      end
+      if writeR_set.length > 0
+        sub_hash = {}
+        for key in writeR_set do
+          sub_hash[key] = true
+        end
+        new_hash[:writeR] = sub_hash
+      end
+      return nil unless new_hash != {}
+      new_hash
+    end
+
+    def transformers_wo_worlds
+      new_transformers = []
+      @transformers.each do |trans|
+        if trans.is_a?(BaseTransformer)
+          new_trans = trans.clone
+          new_state = new_trans.state.clone
+          new_state.delete(:Worlds)
+          new_trans.state = new_state
+          new_transformers << new_trans
+        else
+          raise GuardRailsError, "Multi-Depth Mixing of Composed Transformers is Unsupported"
+        end
+      end
+      new_transformers
+    end
+    
+    # Transforms the given string with all of the BaseTransformerss stored in the
+    # @transformers array.  In order to show no preference to any particular order
+    # of transformer applications, all permutations of the set of BaseTransformers
+    # are tried.  If the results are all the same, then the string is sanitized as
+    # specified by tall the transformers.  If not, an error is raised. Unfortunately,
+    # this scales with n! for n transformers, however, there should never be too many,
+    # as taint blending is a fairly rare event to begin with.  Note here again,
     # that this function is not always called when a string is tranformed using a
     # ComposedTransformer.  HTML, for example, has its own custom sanitization setup
     # for ComposedTransformers that does not call this method.
 
-    # TODO: Change ComposedTransformer transformation to more accurately reflect the
-    # description given in the paper
-
     def transform(string, top_level_context = nil, additional_context=nil)
-      activeString = string
-      @transformers.each do |t|
-        activeString = t.transform(activeString, top_level_context, additional_context)
-      end
-      return activeString
+      current_value = nil
+      @transformers.permutation do |t_set|
+        activeString = string
+        t_set.each do |t|
+          activeString = t.transform(activeString, top_level_context, additional_context)
+        end
+        if current_value.nil?
+          current_value = activeString
+        else
+          if current_value != activeString
+            raise GuardRailsError, "Mixed Transformers are Non-Commutative"
+          end
+        end
+      end      
+      return current_value
     end
 
     # Makes a "deep copy" of itself by cloning all of the stored transformers
@@ -396,97 +510,6 @@ class Object
   end
 end
 
-=begin
-class Hash
-  # NOTE!!!: These are incomplete.  
-  # Should add delete, clear, merge, select, etc. for completeness
-  if !{}.respond_to?("old_index_set")
-    alias old_index_set []=
-  end
-  if !{}.respond_to?("old_keys")
-    alias old_keys keys
-    alias old_each each
-    alias old_init initialize
-  end
-  def initialize(*args)
-    old_init(*args)
-#    puts "intercepting #{self}"
-  end
-  def []=(*args)
-    args.each do |a|
-      if String === a        
-        if !a.safe?
-          @tainted_keys ||= {}
-          @tainted_keys.old_index_set(a,a.taint)
-        end
-      end
-    end
-    old_index_set(*args)
-  end
- =begin
-  def each(&block)
-    old_each do |key, val|
-      if @tainted_keys && @tainted_keys[key] 
-        k2 = eval(key.inspect) #Clone Unfreeze Trick
-        k2.taint = @tainted_keys[key]
-        key = k2
-      end
-      yield key,val
-    end
-  end
- =end
-  def keys
-    res = old_keys
-#    puts res.inspect
-    if @tainted_keys
-      res.map! do |k|
-        if @tainted_keys[k] 
-          k2 = eval(k.inspect) #Clone Unfreeze Trick
-          k2.taint = @tainted_keys[k]
-          k2
-        else
-          k
-        end        
-      end
-    end
-   return res
-  end
-end
-=end
-
-# TODO: Are the following two definitions necessary? We don't much care about integers
-# or floats...
-
-# Kernel modified to add support for String to Number casting via +Integer+ and +Float+.
-module Kernel
-
-  # Overrides default integer casting via +Integer+, by using <tt>to_i</tt>.  
-  #  Note: +Integer+ is supposed to behave slightly differently than <tt>to_i</tt>
-  #  with regards to things like strings marked as hexadecimal. For some reason
-  #  aliasing wasn't working here, so <tt>to_i</tt> is invoked instead.  This
-  #  should be fixed eventually
-
-  def Integer(obj)
-    begin
-      return obj.to_i
-    rescue
-      raise TypeError
-    end
-  end
-
-  # Overrides default integer casting via +Float+, by using <tt>to_f</tt>.  
-  #  Note: +Float+ is probably supposed to behave slightly differently than <tt>to_f</tt>
-  #  as with +Integer+.  This should be investigated
-
-  def Float(obj)
-    begin
-      return obj.to_f
-    rescue
-      raise TypeError
-    end
-  end
-
-end
 
 #--
 ### ----------------------------------------------------------------
@@ -933,13 +956,15 @@ class String
   end
 
   # Return an sql-safe version of the qstring
+  # ** This method is depricated and has been replaced
+  #    by the more general "transform" method
   def pull_sql_safe        
     new_string = ""
     each_chunk do |str, tnt|
       if tnt.nil? || tnt.state[:SQL] == nil
         new_string += str
       else
-        new_string += tnt.state[:SQL].sanitize(str)
+        new_string += tnt.state[:SQL].class.sanitize(str)
       end
     end
     return new_string

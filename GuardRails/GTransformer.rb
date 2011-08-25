@@ -169,7 +169,6 @@ class GTransformer
       ast = ast.insert_at_front(@parser.parse("require 'wrapper'"))
       ast.insert_into_class!(@parser.parse(
       "include Wrapper; include Wrapper::WrapperMethods"), true)
-
       ast.insert_into_class! @parser.parse("unloadable"), true
       ast=insert_model_proxies(ast,model_names,filename)
       ast=insert_requires(ast,require_list)

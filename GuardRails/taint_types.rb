@@ -6,6 +6,8 @@ module TaintTypes
   include ActionView::Helpers
  
   class TType
+    @@exception_tags = ["area","base","br","col","command", "embed", "eventsource", "hr", "img", "input", "link", "meta", "param", "source"]
+
     def inspect
       "#{self.class}"
     end
@@ -17,11 +19,6 @@ module TaintTypes
    # In addition, things like quotes that are started but not finished are 
    # also checked.
 
-   # TODO: Currently we are very strict about what counts as well-formed
-   # HTML.  <img src=".."> counts as invalid because it does not end with
-   # a "/" or a "</img>".  It is common to do this, however, so we probably
-   # need this to be more flexible
-
    def self.tag_protect(string, racl=nil, wacl=nil)
       old_taint = string.taint
       idx = 0
@@ -30,14 +27,14 @@ module TaintTypes
       # are any issues, an error will be thrown and the rescue
       # clause will replace any "<" and ">" characters with their
       # HTML-escaped equivalents
-      begin
+#      begin
         while idx<string.length
           idx,string = self.parse_tags(string,0,nil,racl,wacl)
         end
-      rescue
-        string.gsub!("<","&lt;")
-        string.gsub!(">","&gt;")
-      end
+#      rescue
+#        string.gsub!("<","&lt;")
+#        string.gsub!(">","&gt;")
+#      end
 
       # Return either the original string that has well-formed HTML
       # (assuming racl and wacl are nil), the HTML with RACL and WACL
@@ -113,7 +110,7 @@ module TaintTypes
         # If we're past the end of the string and we were expecting
         # to find a terminating tag (if "close" is not nil), then
         # we have a problem of an unterminated tag
-        if idx >= string.length && close != nil
+        if idx >= string.length && close != nil && !@@exception_tags.include?(close)
           raise StandardError, "unclosed tag"
         end
 
@@ -131,6 +128,7 @@ module TaintTypes
 
         # Checking for the start of new open tag
         if string[idx,1] == "<"
+          reset_point = idx
           activetag = "" # will store the name of the current tag
           idx += 1
           if idx >= string.length
@@ -188,10 +186,14 @@ module TaintTypes
             # The name of the close tag must match the one we
             # are looking for, otherwise we have a case of overlapping
             # tags (i.e. <b><i></b></i>), which is forbidden in rigid 
-            # HTML syntax, although some browsers still accept it
+            # HTML syntax, although some browsers may still accept it
 
             if activetag != close
-              raise StandardError, "mismatched tags"            
+              if @@exception_tags.include?(close)
+                return reset_point, string
+              else
+                raise StandardError, "mismatched tags"            
+              end
             end
             idx += 1
             return idx, string
@@ -339,6 +341,7 @@ module TaintTypes
   # trouble when used in SQL query
   class SQLDefault < SQLBase
     def self.sanitize(string)
+      puts "Sanitizing!!!"
       string = string.gsub("'", "")
       string = string.gsub("\\", "")
       string = string.gsub("\"", "")
@@ -445,10 +448,6 @@ end
 # commonly used XPath contexts.  This should allow developers
 # to use these nicknames, or their corresponding strings 
 # when constructing annotations
-
-# TODO: These nicknames are currently unsupported in annotations.
-# Annotation currently allow only XPath strings for HTML contexts.
-# Support for these nicknames should be added.
 
 class TaintContexts
   TagAttribute = "//@*"

@@ -84,7 +84,7 @@ module Wrapper
           arg[m] = clean_arg(arg[m])
         end
       elsif arg.class == String
-        arg = arg.pull_sql_safe
+        arg = arg.transform(:SQL)
       end
       return arg
     end
@@ -400,17 +400,60 @@ module Wrapper
         end
       end
 
+      # Make sure that the parameters passed into SQL queries (which are
+      # constructed out of 'find' and 'count' function calls) are 
+      # appropriately sanitized before they are executed
+      if method.to_s == "find" || method.to_s == "count"
+        args = clean_args(args)
+      end
+
+      # The "count" method should return the number of VISIBLE objects
+      # and should not leak information about how many objects meet 
+      # a certain criteria.  Since 'count' and 'find(:all)' have similar
+      # syntax, the count parameters are passed to the find method
+      # and the query results are then counted
+
+      if method.to_s == "count"
+        group_handling = false
+        begin
+          return_val = self.send("all",*args)
+        rescue
+          group_handling = true
+          if args[0][:group] != nil
+            group = args[0][:group]
+            args[0].delete(:group)
+          end
+          return_val = self.send("all",*args)
+        end
+        if group_handling
+          hash_store = Hash.new
+          return_val.each do |t|
+            key = t.send(group)
+            if (hash_store.has_key?(key))
+              hash_store[key] << t
+            else
+              hash_store[key] = Array.new
+              hash_store[key] << t
+            end
+          end
+          hash_store.each_pair do |key, val|
+            hash_store[key] = visible_array(val).size
+          end
+          return hash_store
+        else
+          return return_val.size
+        end
+      end
+
       # Perform the desired method call, now that it is known
       # that it is not an illegal delete or create:
 
       return_val = @target.send(method, *args, &block)
       return nil if return_val.nil?
 
-      # TODO: Doesn't this input need to be SQL sanitized??
-      # TODO: What happened to the case of the "count" method?
-      # The count method should return a number that reflects the number
-      # of VISIBLE elements that will be listed by the equivalent "find"
-      # command
+      if return_val.class == ActiveRecord::NamedScope::Scope
+        return ModelProxy.new(return_val)
+      end
 
       # Objects just pulled from the database must have their
       # access control policies established
@@ -424,9 +467,6 @@ module Wrapper
       # should be hidden from the user.  If there are hidden elements,
       # they must be removed from the array.
 
-      # TODO: Shouldn't there be a "eval_violation" here for when objects are
-      # removed from the array?  Naturally it should be passive by default, but
-      # the developer may want to specify that an error should be raised
       if return_val.is_a? Array
         new_results = []
 
@@ -436,6 +476,14 @@ module Wrapper
             if element.gr_is_visible?
               new_results << element
               element.gr_policy_setup
+            else
+              # Trigger violation if items are removed.
+              # Note that in most read_access cases, the
+              # would-be element is replaced by the return
+              # value from the violation function, but in this
+              # case, removing the object completely makes
+              # a bit more sense
+              element.eval_violation(:read_access)
             end
           else
             new_results << element

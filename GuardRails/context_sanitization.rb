@@ -53,106 +53,115 @@ module ContextSanitization
         # the chunk is linked with a ComposedTransformer, then each of the
         # transformations associated with each of the Transformers in the 
         # ComposedTransformer need to be applied separately
-        taint_layers = Array.new
+        taint_layers = Array.new        
         case tnt
         when BaseTransformer
           taint_layers << tnt
+          world_state = tnt.state[:Worlds]
         when ComposedTransformer
-          taint_layers = tnt.transformers
+          taint_layers = tnt.transformers_wo_worlds
+          world_state = tnt.pull_worlds
         else
           taint_layers << tnt
         end
-
-        transformed_string = str
-
-        # Iterate through each of the transformations that need to be 
-        # performed (usually only 1)
-        taint_layers.each do |transform|
-          transmethod = nil #Will stores the transformer that best matches the context
-
-          # Check to make sure that the Transformer has an :HTML top-level 
-          # context.  If not, much less work has to be done.
-          if !transform.state.has_key?(:HTML)           
-
-            # Even if the Transformer has no HTML rules, it may still dictate
-            # which "Worlds" the content of the string should be in (tie in
-            # to Yuchen Zhou's work)
-            if transform.state.has_key?(:Worlds)
-              transformed_string = "<span RACL='#{(get_keys(transform.state[:Worlds][:read])+get_keys(transform.state[:Worlds][:readR]))*','}' WACL='#{(get_keys(transform.state[:Worlds][:write])+get_keys(transform.state[:Worlds][:writeR]))*','}'>" + transformed_string + "</span>"  
-
-              # If the chunk has rules for recursive world assignment (applying
-              # the world labels to all tags found in chunk, not just around the
-              # outsides), add the extra world attributes.  This will only occur
-              # IF THE CHUNK CONTAINS ONLY WELL-FORMED HTML!
-              if transformed_string == TaintTypes::TType.tag_protect(transformed_string)
-                transformed_string = TaintTypes::TType.tag_protect(transformed_string, get_keys(transform.state[:Worlds][:readR]), get_keys(transform.state[:Worlds][:writeR]))
+        active_string = nil
+        taint_layers.permutation.each do |layer_set|      
+          transformed_string = str
+          
+          # Iterate through each of the transformations that need to be 
+          # performed (usually only 1)
+          index = 0
+          layer_set.each do |transform|
+            index += 1
+            transmethod = nil #Will store the transformer that best matches the context
+            
+            # Check to make sure that the Transformer has an :HTML top-level 
+            # context.  If not, much less work has to be done.
+            if !transform.state.has_key?(:HTML)           
+              
+              # Even if the Transformer has no HTML rules, it may still dictate
+              # which "Worlds" the content of the string should be in (tie in
+              # to Yuchen Zhou's work)
+              if !world_state.nil? && (index == layer_set.length)
+                transformed_string = "<span RACL='#{(get_keys(world_state[:read])+get_keys(world_state[:readR]))*','}' WACL='#{(get_keys(world_state[:write])+get_keys(world_state[:writeR]))*','}'>" + transformed_string + "</span>"  
+                
+                # If the chunk has rules for recursive world assignment (applying
+                # the world labels to all tags found in chunk, not just around the
+                # outsides), add the extra world attributes.  This will only occur
+                # IF THE CHUNK CONTAINS ONLY WELL-FORMED HTML!
+                if transformed_string == TaintTypes::TType.tag_protect(transformed_string)
+                  transformed_string = TaintTypes::TType.tag_protect(transformed_string, get_keys(world_state[:readR]), get_keys(world_state[:writeR]))
+                end
               end
-            end
-
-          # Now on to the case where there is a defined :HTML top-level
-          # context rule
-          else
-            
-            # Using the :HTML top-level context rules, determine the correct
-            # transformation to apply
-            transmethod = hash_recurse(transform.state[:HTML], new_text, index, str)
-
-            # Annotation syntax specifies transformations using symbols, so
-            # these need to be converted to instances of the appropriate
-            # transformation object (TaintType) from taint_types.rb            
-            if transmethod.is_a?(Symbol)
-              transmethod = eval("TaintTypes::#{transmethod.to_s}.new")
-            end            
-            
-            # Invoke the transformation method of the transformation (TaintType)
-            transformed_string = transmethod.safe_class.sanitize(transformed_string)
-
-            # Check to make sure that the chunk after the transformation still 
-            # does not contain any malformed HTML, particularly, check to make
-            # sure that the chunk does not open any tags without closing them
-            # or vice-versa
-            afterString = transmethod.safe_class.tag_protect(transformed_string)            
-            if transformed_string == afterString && transform.state.has_key?(:Worlds)
-
-              # Again, apply the recursive read and write worlds to all tags 
-              # in the newly transformed chunk, but only if the chunk has
-              # well-formed HTML that does close or open too many tags
-              transformed_string = TaintTypes::TType.tag_protect(transformed_string, get_keys(transform.state[:Worlds][:readR]), get_keys(transform.state[:Worlds][:writeR]))
+              
+              # Now on to the case where there is a defined :HTML top-level
+              # context rule
             else
               
-              # Even if the chunk has been sanitized and does not have a Worlds
-              # context, it still needs to contain well-formed HTML as not 
-              # requiring this can lead to some issues with chunks closing
-              # tags from other chunks.  Note that if the chunk is deemed malformed,
-              # it will simply have its < and > characters replaced with &lt; and
-              # &gt; respectively.
-
-              #TODO: Our current definition of well-formed HTML includes adding the 
-              # "/" to the end of single tags like "img" and "br", which most people
-              # don't do.  We should make it more flexible, but not insecure. See
-              # taint_types.rb for more
-
-              transformed_string = afterString
+              # Using the :HTML top-level context rules, determine the correct
+              # transformation to apply
+              transmethod = hash_recurse(transform.state[:HTML], new_text, index, str)
+              
+              # Annotation syntax specifies transformations using symbols, so
+              # these need to be converted to instances of the appropriate
+              # transformation object (TaintType) from taint_types.rb            
+              if transmethod.is_a?(Symbol)
+                transmethod = eval("TaintTypes::#{transmethod.to_s}.new")
+              end            
+            
+              # Invoke the transformation method of the transformation (TaintType)
+              transformed_string = transmethod.safe_class.sanitize(transformed_string)
+              
+              # Check to make sure that the chunk after the transformation still 
+              # does not contain any malformed HTML, particularly, check to make
+              # sure that the chunk does not open any tags without closing them
+              # or vice-versa
+              afterString = transmethod.safe_class.tag_protect(transformed_string)            
+              if transformed_string == afterString && !world_state.nil? && (index == taint_layers.length)
+                
+                # Again, apply the recursive read and write worlds to all tags 
+                # in the newly transformed chunk, but only if the chunk has
+                # well-formed HTML that does close or open too many tags
+                transformed_string = TaintTypes::TType.tag_protect(transformed_string, get_keys(world_state[:readR]), get_keys(world_state[:writeR]))
+              else
+                
+                # Even if the chunk has been sanitized and does not have a Worlds
+                # context, it still needs to contain well-formed HTML as not 
+                # requiring this can lead to some issues with chunks closing
+                # tags from other chunks.  Note that if the chunk is deemed malformed,
+                # it will simply have its < and > characters replaced with &lt; and
+                # &gt; respectively.
+                
+                transformed_string = afterString
+              end
+              
+              # Already done the recursive worlds additions, but now need to 
+              # add the spans around the content if there are ANY Worlds
+              # annotations
+              if !world_state.nil? && (index == taint_layers.length)
+                transformed_string = "<span RACL='#{(get_keys(world_state[:read])+get_keys(world_state[:readR]))*','}' WACL='#{(get_keys(world_state[:write])+get_keys(world_state[:writeR]))*','}'>" + transformed_string + "</span>"
+              end
+              
+              # If the newly transformed chunk is not tainted, it
+              # will throw off our count of which tainted chunk we are
+              # on, so we nee to compensate
+              if transformed_string.taint.nil?
+                index -= 1
+              end
             end
-
-            # Already done the recursive worlds additions, but now need to 
-            # add the spans around the content if there are ANY Worlds
-            # annotations
-            if transform.state.has_key?(:Worlds)
-              transformed_string = "<span RACL='#{(get_keys(transform.state[:Worlds][:read])+get_keys(transform.state[:Worlds][:readR]))*','}' WACL='#{(get_keys(transform.state[:Worlds][:write])+get_keys(transform.state[:Worlds][:writeR]))*','}'>" + transformed_string + "</span>"
-            end
-
-            # If the newly transformed chunk is not tainted, it
-            # will throw off our count of which tainted chunk we are
-            # on, so we nee to compensate
-            if transformed_string.taint.nil?
-              index -= 1
+          end
+          
+          if active_string.nil?
+            active_string = transformed_string
+          else
+            if active_string != transformed_string          
+              raise GuardRailsError, "Mixed Transformers are Non-Commutative"
             end
           end
         end
 
         # Add the newly transformed chunk to the current working string
-        new_string += transformed_string    #.set_taint(tnt)
+        new_string += active_string    #.set_taint(tnt)
         
         index += 1
         orig_index +=1
@@ -183,6 +192,9 @@ module ContextSanitization
         # We only care about the :DEFAULT element if none
         # of the others match, so ignore it for now
         if key != :DEFAULT
+          if key.is_a?(Symbol)
+            key = eval("TaintContexts::" + key.to_s)      
+          end
           if taint_there?(new_text,key,index)      
 
             # If it's a hash, then keep going deeper, if not, then 

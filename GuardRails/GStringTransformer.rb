@@ -18,23 +18,23 @@ class GTransformer
     app_control.insert_into_class! @parser.parse("include TaintSystem; include TaintTypes; include ExtraString"),true
     app_control.insert_into_class! @parser.parse('before_filter :taint_setup'),true
     app_control.insert_into_class! @parser.parse('
-			def taint_setup
-				if params != nil
-		   		params.each_pair do |key, val|
-						if !in_set?(["authenticity_token","controller","action"],key)
-							if val.class == String
-								params[key] = val.mark_default_tainted
-							elsif Hash === val
-								val.each_pair do |key2,val2|
-						     		if val2.class == String
-						       		params[key][key2] = val2.mark_default_tainted
-						     		end
-								end
-				      	end
-				    	end
-					end
-		     	end
-			end')
+	def taint_setup
+		if params != nil
+		   params.each_pair do |key, val|
+			if !in_set?(["authenticity_token","controller","action"],key)
+				if val.class == String
+					params[key] = val.mark_default_tainted
+				elsif Hash === val
+					val.each_pair do |key2,val2|
+			     		    if val2.class == String
+				       	 	params[key][key2] = val2.mark_default_tainted
+			     	 	    end
+				        end
+		      	        end
+		        end
+	           end
+		end
+	 end')
 
     # All models need to include TaintSystem
     for ast in asts[:model].values do
@@ -54,14 +54,13 @@ class GTransformer
 
     for iter_block in ast.deep_find_all(
       lambda { |sexp| sexp[0] == :iter and sexp[1].is_a? Sexp and sexp[1][0] == :call and sexp[1][2] == :create_table} ) do
-
       # Bad practice. Weird syntax causes crashes
       call_block 		= iter_block[1]
       table_name 		= call_block[3][1][1]
       column_blocks 	= iter_block[3]
 
-      tables_to_fields[table_name] 	= []
-      new_columns		 					= []
+      tables_to_fields[table_name] = []
+      new_columns = []
 
       for column_block in column_blocks do
         next unless column_block.is_a? Sexp
@@ -114,19 +113,20 @@ class GTransformer
         "alias str_raw_#{field} #{field}")
         ast.insert_class_stmt @parser.parse(
         "def #{field}
-					 result = str_raw_#{field}
-					 result.taint = #{field}_taint unless result.nil? or !result.taint.nil?
-					 return result
-				 end")
+  	   result = str_raw_#{field}
+	   result.taint = #{field}_taint unless result.nil? or !result.taint.nil?
+	   return result
+	end")
 
         ast.insert_class_stmt @parser.parse(
         "alias str_raw_#{field}= #{field}=")
         ast.insert_class_stmt @parser.parse(
-        "def #{field}=(val)
-					val = val.to_qstring
-					self.send('str_raw_#{field}=', val)
-					self.#{field}_taint = val.taint
-				 end")
+           "def #{field}=(val)
+		self.send('str_raw_#{field}=', val)
+                if val.is_a?(String)
+   		   self.#{field}_taint = val.taint
+                end
+   	   end")
       end
     end
   end
@@ -147,7 +147,7 @@ class GTransformer
   def taint_tracking_transformations(asts)
     default_transformations(asts)
     begin
-      tables_to_fields = process_fields_and_transform_schema(asts[:migration])
+      tables_to_fields = process_fields_and_transform_schema(asts[:migration])     
       models_to_fields = convert(tables_to_fields)
     rescue
       tables_to_fields={};
@@ -165,39 +165,6 @@ class GTransformer
     asts[:taint_migration]= create_taint_migration models_to_fields
   end
 
-  # There are quite a few statements that can break the string tainting. We need to transform
-  # them into equivalent statements that we can handle.
-  #def disallow_functions
-
-  #	for filetype in @asts.keys
-  #		next if @asts[filetype].keys == nil
-  #		for filename in @asts[filetype].keys
-  #			interp_to_concat @asts[filetype][filename]
-  #			safe_meta_data(filetype, filename)
-  #		end
-  #	end
-
-  #end
-
-  #def safe_meta_data(filetype, filename)
-  #Need to do assignment because gsub on sexps does not modify the calling object.
-
-  #	@asts[filetype][filename] = @asts[filetype][filename].gsub(
-  #			Sexp.from_array([:back_ref, :&]), (Sexp.from_array [:gvar, :$gr_and]))
-  #	@asts[filetype][filename] = @asts[filetype][filename].gsub(
-  #			Sexp.from_array([:back_ref, "`".to_sym]), (Sexp.from_array [:gvar, :$gr_left]))
-  #	@asts[filetype][filename] = @asts[filetype][filename].gsub(
-  #			Sexp.from_array([:back_ref, "'".to_sym]), (Sexp.from_array [:gvar, :$gr_right]))
-  #	@asts[filetype][filename] = @asts[filetype][filename].gsub(
-  #			Sexp.from_array([:back_ref, :+]), (Sexp.from_array [:gvar, :$gr_plus]))
-
-  #	for i in (1..9)
-  #		@asts[filetype][filename] = @asts[filetype][filename].gsub(
-  #			Sexp.from_array([:nth_ref, i]), (Sexp.from_array [:gvar, "$gr_#{i}".to_sym]))
-  #	end
-
-  #end
-
   def interp_to_concat(ast)
     return unless ast.is_a? Sexp
 
@@ -207,46 +174,13 @@ class GTransformer
         x = convert_to_concat(ast[i][1..-1]) if ast[i][0] == :dstr
         pp ast[i] if x != nil
         ast[i] = x if x != nil
-        #pp x if x != nil
         puts "" if x != nil
         interp_to_concat(ast[i])
       end
     end
   end
 
-  # Given a tablename returns the filename of the corresponding model
-  # "users" => "user.rb"
-
-  # TODO Improve runtime of this
-  #def get_modelname(tablename)
-  #	for modelname in @asts[:model].keys
-  #		cond = lambda { |sexp|
-  #			sexp[0] == :class and pluralize(2, sexp[1].to_s)[2..-1] == tablename.to_s.capitalize
-  #		}
-  #
-  #			if @asts[:model][modelname].deep_find(cond) != nil
-  #				return modelname
-  #			end
-  #		end
-  #	end
-
-  #	def string_field
-  #		lambda{|sexp|
-  #			sexp[0] == :call and (
-  #			sexp[2] == :string or (
-  #			sexp[2] == :column and sexp[3][2][1] == :string))}
-  #	end
-
-  #	# If sexp is like [[sexp]] returns sexp
-  #	def clean (arr)
-  #		return clean arr[0] unless arr.length != 1 or arr[0].is_a? Sexp
-  #		return arr
-  #	end
-
   def convert_to_concat(sexp)
-    #pp sexp
-    #puts "\n"
-
     curr = sexp[0]
 
     # The last statement is either
