@@ -1,8 +1,0 @@
-These are users
-<table border>
-<% @users.each do |usr| %>
-<tr>
-    <td><%= usr.login %></td><td><%= usr.email %></td><td><a href='#'>Assign Roles</a></td>
-</tr>
-<% end %>
-</table>

@@ -1,7 +1,0 @@
-<% form_for :paper, @paper, :url => { :action => "find_paper" }, :html => {:class => "nifty_form"} do |f| %>
-  <%= f.text_field :title %>
-  <%= submit_tag "Find Papers" %>
-<% end %>
-
-<h1>Papers#index</h1>
-<p>Find me in app/views/papers/index.html.erb</p>
